@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'UI/credits.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI/credits.ui'
 #
-# Created: Thu Oct 23 11:41:39 2008
+# Created: Wed Nov 19 19:39:39 2008
 #      by: PyQt4 UI code generator 4.4.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ class Ui_CreditsDialog(object):
     def setupUi(self, CreditsDialog):
         CreditsDialog.setObjectName("CreditsDialog")
         CreditsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        CreditsDialog.resize(469, 215)
+        CreditsDialog.resize(520, 250)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/about.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         CreditsDialog.setWindowIcon(icon)
@@ -23,7 +23,7 @@ class Ui_CreditsDialog(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
         self.scrollAreaWidgetContents = QtGui.QWidget(self.scrollArea)
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 447, 160))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 498, 195))
         self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
         self.gridLayout = QtGui.QGridLayout(self.scrollAreaWidgetContents)
         self.gridLayout.setObjectName("gridLayout")
@@ -57,6 +57,7 @@ class Ui_CreditsDialog(object):
 "Icons set, CSS for Web Notebook Plugin: Pavluhin Andrey <dr.onx@mail.ru>\n"
 "Russian l10n: Alexey Kolesnikov <ackerman@gmail.com>\n"
 "iCal parser library: Max M <maxm@mxm.dk>\n"
-"Mandriva mantainer: Funda Wang <fundawang@mandriva.org>", None, QtGui.QApplication.UnicodeUTF8))
+"Mandriva mantainer: Funda Wang <fundawang@mandriva.org>\n"
+"CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day <stephen_day@gmail.com>", None, QtGui.QApplication.UnicodeUTF8))
 
 import notefinder_rc

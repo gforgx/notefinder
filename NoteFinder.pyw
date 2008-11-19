@@ -367,7 +367,7 @@ class Application(Qt.QObject):
         config.set('UI', 'Dates', self.settingsDialog.ui.showDates.isChecked())
 
         config.write(open(config.file, 'w'))
-        
+
         self.readSettings()
         self.refresh()
 
