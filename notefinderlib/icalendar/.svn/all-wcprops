@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/!svn/ver/56468/iCalendar/trunk/src/icalendar
+END
+parser.py
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/!svn/ver/34910/iCalendar/trunk/src/icalendar/parser.py
+END
+util.py
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/19619/iCalendar/trunk/src/icalendar/util.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/!svn/ver/19619/iCalendar/trunk/src/icalendar/__init__.py
+END
+cal.py
+K 25
+svn:wc:ra_dav:version-url
+V 56
+/svn/!svn/ver/34874/iCalendar/trunk/src/icalendar/cal.py
+END
+prop.py
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/56468/iCalendar/trunk/src/icalendar/prop.py
+END
+tools.py
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svn/!svn/ver/19619/iCalendar/trunk/src/icalendar/tools.py
+END
+interfaces.py
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/!svn/ver/19636/iCalendar/trunk/src/icalendar/interfaces.py
+END
+caselessdict.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/34866/iCalendar/trunk/src/icalendar/caselessdict.py
+END

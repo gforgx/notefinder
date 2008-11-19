@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.1
+Encoding=UTF-8
+Type=Application
+Name=NoteFinder
+Name[ru]=NoteFinder
+GenericName=Desktop note-taking application
+GenericName[ru]=Менеджер заметок
+Exec=NoteFinder.pyw
+Icon=/usr/share/notefinder/icon.png
+Terminal=false
+Categories=Utility;
+
+

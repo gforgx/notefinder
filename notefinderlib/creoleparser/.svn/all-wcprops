@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/80/trunk/creoleparser
+END
+core.py
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/80/trunk/creoleparser/core.py
+END
+dialects.py
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/69/trunk/creoleparser/dialects.py
+END
+elements.py
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/70/trunk/creoleparser/elements.py
+END
+test_cheat_sheet_plus.py
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/63/trunk/creoleparser/test_cheat_sheet_plus.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/68/trunk/creoleparser/__init__.py
+END
+tests.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/70/trunk/creoleparser/tests.py
+END

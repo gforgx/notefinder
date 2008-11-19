@@ -1,0 +1,17 @@
+== Requirements ==
+
+* Python >= 2.5
+* PyQt >= 4.3
+* setuptools
+
+=== Optional ===
+
+* feedparser
+
+== Installation ==
+
+Run 
+
+python setup.py install --root=/
+
+as root user

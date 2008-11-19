@@ -1,0 +1,54 @@
+8
+
+dir
+58451
+http://codespeak.net/svn/iCalendar/trunk/src/icalendar/tests
+http://codespeak.net/svn
+
+
+
+2008-07-11T17:52:08.745240Z
+56463
+regebro
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+fd0d7bf2-dfb6-0310-8d31-b7ecfe96aada
+
+__init__.py
+file
+
+
+
+
+2008-09-27T09:41:26.000000Z
+f67c4f2235035fc8a1ddc3b82808476d
+2005-03-23T16:38:19.319667Z
+10130
+faassen
+has-props
+
+test_icalendar.py
+file
+
+
+
+
+2008-09-27T09:41:26.000000Z
+04cecacdd47fdea8ff8bc918444469cb
+2008-07-11T17:52:08.745240Z
+56463
+regebro
+has-props
+
