@@ -600,6 +600,10 @@ class Application(Qt.QObject):
     
         for i in (tab.ui.tagEdit,tab.ui.tagsList, tab.ui.addTagButton,tab.ui.delTagButton, tab.ui.autoTagButton):
             i.setHidden(not self.notebook.backend.Tag)
+
+        if self.notebook.backend.Tag:
+            if self.parameter[0] == self.notebook.getNotesByTag:
+                tab.addTag(self.parameter[1])
     
         tab.ui.nameEdit.setText(unicode(name, 'utf'))
         tab.ui.date.setText('%d-%d-%d' % localtime()[:3])

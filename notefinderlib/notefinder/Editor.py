@@ -66,9 +66,10 @@ class EditorWidget(Qt.QWidget):
 
         self.ui.tagEdit.setEditText('')
 
-    def addTag(self):
+    def addTag(self, line=None):
         """ Adding entered tag to list """
-        line = str(self.ui.tagEdit.currentText().toUtf8())
+        if line is None:
+            line = str(self.ui.tagEdit.currentText().toUtf8())
 
         if not line == '' and not line in self.tags():
             notes = self.app.notebook.getNotesByTag(line)
