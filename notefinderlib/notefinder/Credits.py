@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI/credits.ui'
+# Form implementation generated from reading ui file 'UI/credits.ui'
 #
-# Created: Wed Nov 19 19:39:39 2008
+# Created: Fri Nov 21 18:37:31 2008
 #      by: PyQt4 UI code generator 4.4.3
 #
 # WARNING! All changes made in this file will be lost!
@@ -47,17 +47,18 @@ class Ui_CreditsDialog(object):
 
     def retranslateUi(self, CreditsDialog):
         CreditsDialog.setWindowTitle(QtGui.QApplication.translate("CreditsDialog", "Credits", None, QtGui.QApplication.UnicodeUTF8))
-        self.credits.setText(QtGui.QApplication.translate("CreditsDialog", "Author: Simonenko Sergey <gforgx@gmail.com>\n"
-"PyCreole library: Peter Hoffmann <tosh54@gmail.com>\n"
+        self.credits.setText(QtGui.QApplication.translate("CreditsDialog", "Author: Simonenko Sergey <gforgx@lavabit.com>\n"
 "NoteFinder Icon designer: Zagorujko Olga <melfina2106@mail.ru>\n"
+"PyCreole library: Peter Hoffmann <tosh54@gmail.com>\n"
 "SVG logo author: genius <nasledieprofessora@gmail.com>\n"
 "Creative ideas: drw <drwpub@gmail.com>\n"
 "Windows Beta-testing: Горын <crazylimo@gmail.com>\n"
 "PyTesser library: Michael J.T. O\'Kelly <mokelly@mit.edu>\n"
 "Icons set, CSS for Web Notebook Plugin: Pavluhin Andrey <dr.onx@mail.ru>\n"
-"Russian l10n: Alexey Kolesnikov <ackerman@gmail.com>\n"
+"Russian l10n: Alexey Kolesnikov <ackerman2007@gmail.com>\n"
 "iCal parser library: Max M <maxm@mxm.dk>\n"
 "Mandriva mantainer: Funda Wang <fundawang@mandriva.org>\n"
+"FeedParser library: Mark Pilgrim <pilgrim@gmail.com>\n"
 "CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day <stephen_day@gmail.com>", None, QtGui.QApplication.UnicodeUTF8))
 
 import notefinder_rc

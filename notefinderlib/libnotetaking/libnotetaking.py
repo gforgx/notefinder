@@ -89,8 +89,8 @@ class Config(ConfigParser.ConfigParser):
         self.write(open(self.file, 'w'))
         
     def deleteNotebook(self, name):
-        self.remove_option(self.getBackend(name), name)
         self.remove_option('Notebooks', name)
+        self.remove_option(self.getBackend(name), name)
         self.remove_option(self.get('Markup', name), name)
 
         self.write(open(self.file, 'w'))
@@ -118,7 +118,6 @@ class Config(ConfigParser.ConfigParser):
 config = Config()
 
 class Notebook(object):
-    """ Notebook class """
     def __init__(self, name):
         self.name = name
 
@@ -128,10 +127,7 @@ class Notebook(object):
         except KeyError:
             raise Exception("Notebook doesn't exist")
 
-        try:
             self.markup = config.get('Markup', self.name)
-        except:
-            self.markup = 'Wiki'
 
         self.Wiki = (self.markup == 'Wiki')
 
@@ -162,49 +158,59 @@ class Notebook(object):
         return [note for note in self.getNotes() if Note(note, self).matches(text)]
 
     def search(self, items):
-        """ Advanced search """
-        fullList = []
+        results = []
+
+        # Processing search items
         for item in items:
-            if ':' in item:
-                try:
-                    parameter, keyword = item.split(':')
-                    if parameter == 'date':
-                        notes = self.getNotesByDate(keyword)
-                    elif parameter == 'year':
-                        notes = []
-                        for date in self.getDates():
-                            if date.split('-')[0] == keyword:
-                                notes += self.getNotesByDate(date)
-                    elif parameter == 'month':
-                        notes = []
-                        for date in self.getDates():
-                            if date.split('-')[1] == keyword:
-                                notes += self.getNotesByDate(date)
-                    elif parameter == 'day':
-                        notes = []
-                        for date in self.getDates():
-                            if date.split('-')[2] == keyword:
-                                notes += self.getNotesByDate(date)
-                    elif parameter == 'tag':
-                        notes = self.getNotesByTag(keyword)
-                    elif parameter == 'text':
-                        notes = self.getNotesByText(keyword)
-                    elif parameter == 'title':
-                        notes = []
-                        if Note(keyword, self).exists():
-                            notes.append(keyword)
-                    else:
-                        notes = []
-                except ValueError:
+
+            try:
+                # Trying to split item into parameter, keyword pair
+                parameter, keyword = item.split(':')
+
+                # Checking date
+                if parameter == 'date': notes = self.getNotesByDate(keyword)
+
+                # Checking year
+                elif parameter == 'year':
                     notes = []
-            else:
+                    for date in self.getDates():
+                        if date.split('-')[0] == keyword: notes.extend(self.getNotesByDate(date))
+
+                # Checking month
+                elif parameter == 'month':
+                    notes = []
+                    for date in self.getDates():
+                        if date.split('-')[1] == keyword: notes.extend(self.getNotesByDate(date))
+
+                # Checking day
+                elif parameter == 'day':
+                    notes = []
+                    for date in self.getDates():
+                        if date.split('-')[2] == keyword:  notes.extend(self.getNotesByDate(date))
+
+                # Checking tag
+                elif parameter == 'tag': notes = self.getNotesByTag(keyword)
+
+                # Checking text
+                elif parameter == 'text': notes = self.getNotesByText(keyword)
+
+                # Checking title
+                elif parameter == 'title':
+                    notes = [i for i in [keyword] if self.backend.noteExists(keyword)]
+
+                else:  notes = []
+
+            except ValueError:
+
                 notes = self.getNotesByDate(item) + self.getNotesByTag(item) + self.getNotesByText(item)
-                if Note(item, self).exists():
-                    if item not in notes:
-                        notes.append(item)
-            fullList.append(notes)
-        listIntersection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).intersection(listIntersection(list[1::]))
-        return list(listIntersection(fullList))
+                if self.backend.noteExists(item):
+                    if item not in notes: notes.append(item)
+
+            results.append(notes)
+    
+        intersection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).intersection(intersection(list[1::]))
+
+        return list(intersection(results))
     
     def addTag(self, tag):
         self.backend.createTag(tag)

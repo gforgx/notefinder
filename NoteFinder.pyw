@@ -29,11 +29,13 @@
 #       (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# Standard library imports
 import sys
+import pickle
 from datetime import datetime
 from time import localtime
-import pickle
 from inspect import isclass
+
 try:
     from pkg_resources import iter_entry_points
     PLUGINS = True
@@ -42,9 +44,11 @@ except ImportError:
 
 from PyQt4 import Qt
 
+# Library imports
 from notefinderlib.libnotetaking import *
 from notefinderlib.creoleparser import text2html
 
+# Interface imports
 from notefinderlib.notefinder.About import Ui_AboutDialog
 from notefinderlib.notefinder.AddTag import Ui_AddTagDialog
 from notefinderlib.notefinder.CopyEntry import Ui_CopyDialog
@@ -62,7 +66,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 
 class Application(Qt.QObject):
     def __init__(self):
@@ -320,16 +324,18 @@ class Application(Qt.QObject):
             self.setNotebook('Default')
 
         self.parameter = [self.notebook.getNotes]
-        
+
         self.loadPlugins()
-        
+
         self.refresh()
 
     def readSettings(self):
         config = Config()
         for i in self.settings:
-            try: self.settings[i] = config.getboolean('UI', i)
-            except: pass
+            try:
+                self.settings[i] = config.getboolean('UI', i)
+            except:
+                pass
 
     def applySettings(self):
         self.settingsDialog.ui.toolTips.setChecked(self.settings['Tooltips'])
@@ -574,8 +580,6 @@ class Application(Qt.QObject):
                     text = note.getText()
                     if self.notebook.markup == 'Wiki': 
                         html = text2html(unicode(text, 'utf'))
-                    elif self.notebook.markup == 'Code':
-                        html = highlight(text, guess_lexer(text), HtmlFormatter(style='colorful'))
                     else: 
                         html = text
 

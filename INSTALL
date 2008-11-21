@@ -2,11 +2,12 @@
 
 * Python >= 2.5
 * PyQt >= 4.3
-* setuptools
+* python-setuptools
+* python-genshi
 
 === Optional ===
 
-* feedparser
+* python-feedparser
 
 == Installation ==
 
