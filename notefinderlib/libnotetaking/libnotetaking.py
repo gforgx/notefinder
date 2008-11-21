@@ -127,7 +127,7 @@ class Notebook(object):
         except KeyError:
             raise Exception("Notebook doesn't exist")
 
-            self.markup = config.get('Markup', self.name)
+        self.markup = config.get('Markup', self.name)
 
         self.Wiki = (self.markup == 'Wiki')
 
