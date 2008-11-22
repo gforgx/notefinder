@@ -29,10 +29,10 @@
 #       (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from PyQt4 import Qt
+
 from notefinderlib.libnotetaking import *
 from notefinderlib.creoleparser import text2html
-
-from PyQt4 import Qt
 
 from notefinderlib.notefinder.EditorWidget import Ui_Form
 
@@ -58,7 +58,6 @@ class EditorWidget(Qt.QWidget):
         self.refresh()
 
     def refresh(self):
-        """ Cleaning interface up """
         self.ui.tagEdit.clear()
 
         for tag in self.app.notebook.getTags():
@@ -67,7 +66,6 @@ class EditorWidget(Qt.QWidget):
         self.ui.tagEdit.setEditText('')
 
     def addTag(self, line=None):
-        """ Adding entered tag to list """
         if line is None:
             line = str(self.ui.tagEdit.currentText().toUtf8())
 
@@ -80,19 +78,15 @@ class EditorWidget(Qt.QWidget):
             self.ui.tagEdit.lineEdit().clear()
 
     def deleteTag(self):
-        """ Removing current item from list """
         self.ui.tagsList.takeItem(self.ui.tagsList.currentRow())
 
     def editTag(self):
-        """ Opens item editor """
         self.ui.tagsList.openPersistentEditor(self.ui.tagsList.currentRow())
 
     def tags(self):
-        """ Gets currently added tags list """
         return [str(self.ui.tagsList.item(i).text().toUtf8()) for i in xrange(self.ui.tagsList.count())]
 
     def openUrl(self, url):
-        """ Opens clicked URL (internal or external """
         if str(url.scheme().toUtf8()) != "":
             Qt.QDesktopServices().openUrl(url)
         else:
@@ -102,7 +96,6 @@ class EditorWidget(Qt.QWidget):
                 self.app.new(str(url.path().toUtf8()))
 
     def find(self, text=None):
-        """ Finds text in text browser/editor """
         if text is None:
             text = self.ui.searchEdit.text()
 
@@ -110,7 +103,6 @@ class EditorWidget(Qt.QWidget):
         self.ui.textEdit.find(text)
 
     def update(self):
-        """ Updates HTML Preview """
         text = str(self.ui.textEdit.toPlainText().toUtf8())
 
         if self.app.notebook.markup == 'HTML': 
