@@ -52,10 +52,10 @@ class iPod(object):
         self.notebook = notebook
 
         mountPoint = config.get(self.name, self.notebook)
-        
+
         if not os.path.ismount(mountPoint):
             raise Exception('Specified directory is not iPod mountpoint.')
-        
+
         self.path = os.path.join(mountPoint, 'Notes')
 
     def getNotes(self):

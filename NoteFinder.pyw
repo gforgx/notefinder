@@ -84,30 +84,35 @@ class Application(Qt.QObject):
         try: self.searches = pickle.load(open(self.searchesFile))
         except: self.searches = []
 
-        # Backend icons
-        self.backendIcons = {
-            'DokuWiki' : ':/dokuwiki.png',
-            'iPod' : ':/ipod.png',
-            'Zim' : ':/zim.png',
-            'iCal' : ':/ical.png',
-            'Files' : ':/icon.png',
-            'FileSystem' : ':/icon.png',
-            'Wixi' : ':/wixi.png',
-            'RSS' : ':/rss.png',
-            'Mail': ':/mail_post_to.png'
-        }
-
         # Settings
         self.settings = {
-            'AutoSave' : True,
-            'BackendIcons' : True,
-            'Dates' : False,
-            'SearchCompletion' : True,
-            'SearchOnTheFly' : True,
-            'ShowMetaPanel' : True,
-            'Toolbars' : True,
-            'TrayIcon' : True,
-            'Tooltips' : True,
+            'Bool': {
+                'AutoSave' : True,
+                'BackendIcons' : True,
+                'Dates' : False,
+                'SearchCompletion' : True,
+                'SearchOnTheFly' : True,
+                'ShowMetaPanel' : True,
+                'Toolbars' : True,
+                'TrayIcon' : True,
+                'Tooltips' : True,
+            },
+            'String': {
+                'Icons' : 'default'
+            }
+        }
+
+        # Backend icons
+        self.backendIcons = {
+            'DokuWiki' : ':/icons/dokuwiki.png',
+            'iPod' : ':/icons/ipod.png',
+            'Zim' : ':/icons/zim.png',
+            'iCal' : ':/icons/ical.png',
+            'Files' : ':/icons/icon.png',
+            'FileSystem' : ':/icons/icon.png',
+            'Wixi' : ':/icons/wixi.png',
+            'RSS' : ':/icons/rss.png',
+            'Mail': ':/icons/%s/mail.png' % (self.settings['String']['Icons'])
         }
 
         self.connect(self, Qt.SIGNAL('notesModified()'), self.refresh)
@@ -122,7 +127,6 @@ class Application(Qt.QObject):
         self.mainWindow.ui.dateEdit.setDate(Qt.QDate(date[0], date[1], date[2]))
 
         self.mainWindow.ui.closeButton = Qt.QToolButton(self.mainWindow)
-        self.mainWindow.ui.closeButton.setIcon(Qt.QIcon(':/tab_remove.png'))
         self.mainWindow.ui.closeButton.setToolButtonStyle(Qt.Qt.ToolButtonIconOnly)
         self.mainWindow.ui.closeButton.setShortcut('Ctrl+W')
         self.mainWindow.ui.tabWidget.setCornerWidget(self.mainWindow.ui.closeButton)
@@ -203,7 +207,7 @@ class Application(Qt.QObject):
         self.headerLayout.setSpacing(5)
         self.headerFrame.setLayout(self.headerLayout)
         self.headerLabel = Qt.QLabel()
-        self.headerLabel.setPixmap(Qt.QPixmap(':/note_small.png'))
+        self.headerLabel.setPixmap(Qt.QPixmap(':/icons/%s/small/note.png' % (self.settings['String']['Icons'])))
         self.headerLayout.insertWidget(-1, self.headerLabel, 0)
         self.headerText = Qt.QLabel('<b>NoteFinder %s</b>' % (__version__))
         self.headerLayout.insertWidget(-1, self.headerText, 20)
@@ -312,6 +316,7 @@ class Application(Qt.QObject):
         self.connect(self.settingsDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.writeSettings)
         self.connect(self.settingsDialog.ui.listWidget, Qt.SIGNAL('itemSelectionChanged()'), self.updatePluginMenu)
         self.connect(self.settingsDialog.ui.updatePluginAction, Qt.SIGNAL('triggered()'), self.setPlugins)
+        self.connect(self.settingsDialog.ui.applyThemeButton, Qt.SIGNAL('clicked()'), self.updateIcons)
         
         self.readSettings()
         self.applySettings()
@@ -331,33 +336,101 @@ class Application(Qt.QObject):
 
     def readSettings(self):
         config = Config()
-        for i in self.settings:
+        for i in self.settings['Bool']:
             try:
-                self.settings[i] = config.getboolean('UI', i)
+                self.settings['Bool'][i] = config.getboolean('UI', i)
+            except:
+                pass
+        
+        for i in self.settings['String']:
+            try:
+                self.settings['String'][i] = config.get('UI', i)
             except:
                 pass
 
     def applySettings(self):
-        self.settingsDialog.ui.toolTips.setChecked(self.settings['Tooltips'])
-        self.settingsDialog.ui.backendIcons.setChecked(self.settings['BackendIcons'])
-        self.settingsDialog.ui.trayIcon.setChecked(self.settings['TrayIcon'])
-        self.settingsDialog.ui.autoSave.setChecked(self.settings['AutoSave'])
-        self.settingsDialog.ui.searchCompletion.setChecked(self.settings['SearchCompletion'])
-        self.settingsDialog.ui.searchOnTheFly.setChecked(self.settings['SearchOnTheFly'])
-        self.settingsDialog.ui.showMetaPanel.setChecked(self.settings['ShowMetaPanel'])
-        self.settingsDialog.ui.showDates.setChecked(self.settings['Dates'])
+        self.settingsDialog.ui.toolTips.setChecked(self.settings['Bool']['Tooltips'])
+        self.settingsDialog.ui.backendIcons.setChecked(self.settings['Bool']['BackendIcons'])
+        self.settingsDialog.ui.trayIcon.setChecked(self.settings['Bool']['TrayIcon'])
+        self.settingsDialog.ui.autoSave.setChecked(self.settings['Bool']['AutoSave'])
+        self.settingsDialog.ui.searchCompletion.setChecked(self.settings['Bool']['SearchCompletion'])
+        self.settingsDialog.ui.searchOnTheFly.setChecked(self.settings['Bool']['SearchOnTheFly'])
+        self.settingsDialog.ui.showMetaPanel.setChecked(self.settings['Bool']['ShowMetaPanel'])
+        self.settingsDialog.ui.showDates.setChecked(self.settings['Bool']['Dates'])
 
-        if self.settings['TrayIcon']:
+        if self.settings['Bool']['TrayIcon']:
             self.tray.show()
             self.connect(self.tray, Qt.SIGNAL('activated(QSystemTrayIcon::ActivationReason)'), self.showHide)
 
-        if self.settings['SearchOnTheFly']:
+        if self.settings['Bool']['SearchOnTheFly']:
             self.connect(self.mainWindow.ui.searchEdit, Qt.SIGNAL('textChanged(const QString)'), self.search)
     
-        if self.settings['ShowMetaPanel']:
+        if self.settings['Bool']['ShowMetaPanel']:
             self.mainWindow.ui.splitter.setSizes([220, 1030])
         else:
             self.mainWindow.ui.splitter.setSizes([0, 1030])
+    
+        self.setIcons()
+
+    def setIcons(self):
+        # Main window
+        ## Action icons
+        self.mainWindow.ui.actionNew.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionSave.setIcon(Qt.QIcon(':/icons/%s/save.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionDelete.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionAll.setIcon(Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionToday.setIcon(Qt.QIcon(':/icons/%s/calendar.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionBold.setIcon(Qt.QIcon(':/icons/%s/bold.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionUnderlined.setIcon(Qt.QIcon(':/icons/%s/underline.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionHighlight.setIcon(Qt.QIcon(':/icons/%s/highlight.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionItalic.setIcon(Qt.QIcon(':/icons/%s/italic.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionBulletedList.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionImage.setIcon(Qt.QIcon(':/icons/%s/image.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionTimestamp.setIcon(Qt.QIcon(':/icons/%s/time.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionPreferences.setIcon(Qt.QIcon(':/icons/%s/preferences.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionExit.setIcon(Qt.QIcon(':/icons/%s/exit.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionAddNotebook.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionDeleteNotebook.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionAddTag.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionDeleteTag.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionCopyEntry.setIcon(Qt.QIcon(':/icons/%s/copy.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionRename.setIcon(Qt.QIcon(':/icons/%s/rename.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionE_Mail.setIcon(Qt.QIcon(':/icons/%s/mail.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionBacklinks.setIcon(Qt.QIcon(':/icons/%s/undo.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionFindRelated.setIcon(Qt.QIcon(':/icons/%s/find.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionCreateIndex.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionMerge.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionOpenExternally.setIcon(Qt.QIcon(':/icons/%s/open.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionAbout.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionAboutQt.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
+        self.mainWindow.ui.actionDeleteSelectedSearch.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+
+        ## Misc
+        self.mainWindow.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
+
+        self.mainWindow.ui.closeButton.setIcon(Qt.QIcon(':/icons/%s/close.png' % (self.settings['String']['Icons'])))
+
+        # Dialogs
+        self.deleteDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
+        self.deleteTagDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
+        self.deleteNotebookDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
+        self.renameDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/rename.png' % (self.settings['String']['Icons'])))
+        self.notebookDialog.ui.icon.setPixmap(Qt.QPixmap(':/icons/%s/small/notebook.png' % (self.settings['String']['Icons'])))
+        self.messageDialog.ui.iconLabel.setPixmap(Qt.QPixmap(':/icons/icon.png'))
+        self.settingsDialog.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/icon.png'))
+        self.settingsDialog.ui.tabWidget.setTabIcon(1, Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
+        self.settingsDialog.ui.tabWidget.setTabIcon(2, Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])))
+        self.settingsDialog.ui.tabWidget.setTabIcon(3, Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+
+    def updateIcons(self):
+        if not config.has_section('UI'):
+            config.add_section('UI')
+    
+        self.settings['String']['Icons'] = str(self.settingsDialog.ui.themeEdit.currentText().toUtf8())
+        config.set('UI', 'Icons', self.settings['String']['Icons'])
+        config.write(open(config.file, 'w'))
+
+        self.setIcons()
 
     def writeSettings(self):
         if not config.has_section('UI'):
@@ -471,8 +544,8 @@ class Application(Qt.QObject):
 
                 backend = config.getBackend(i)
     
-                if self.settings['BackendIcons']: icon = self.backendIcons[backend]
-                else: icon = ':/x-office-address-book.png'
+                if self.settings['Bool']['BackendIcons']: icon = self.backendIcons[backend]
+                else: icon = ':/icons/%s/notebook.png' % (self.settings['String']['Icons'])
 
                 item = Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.mainWindow.ui.metaList)
                 if not i == self.notebook.name and not backends[backend].ReadOnly:
@@ -480,28 +553,30 @@ class Application(Qt.QObject):
                 item.setToolTip(self.trUtf8('Backend: %s' % backend))
                 item.type = 'notebook'
         
-        if self.settings['Dates']:
-            for i in self.notebook.getDates():
-                item = Qt.QListWidgetItem(Qt.QIcon(':/history.png'), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+        if self.settings['Bool']['Dates']:
+            dates = self.notebook.getDates()
+            dates.sort()
+            for i in dates:
+                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/date.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
                 item.type = 'date'
 
         if self.notebook.backend.Tag:
             for i in self.notebook.getTags():
-                item = Qt.QListWidgetItem(Qt.QIcon(':/tag.png'), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
 
                 notes = self.notebook.getNotesByTag(i)
                 item.setToolTip(unicode('Notes (%i): %s' % (len(notes), ', '.join(notes)), 'utf'))
                 item.type = 'tag'
 
         for i in self.searches:
-            item = Qt.QListWidgetItem(Qt.QIcon(':/search.png'), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
             item.type = 'search'
         
         # Displaying entries
         self.display(self.parameter)
 
         # Adding search completer items
-        if self.settings['SearchCompletion']:
+        if self.settings['Bool']['SearchCompletion']:
             self.completer = Qt.QCompleter(['tag:' + unicode(i, 'utf') for i in self.notebook.getTags()] \
             + ['date:' + unicode(i, 'utf') for i in self.notebook.getDates()])
             self.mainWindow.ui.searchEdit.setCompleter(self.completer)
@@ -574,9 +649,9 @@ class Application(Qt.QObject):
         for i in entries:
             try:
                 note = Note(i, self.notebook)
-                item = Qt.QListWidgetItem(Qt.QIcon(':/note.png'), unicode(i, 'utf'), self.mainWindow.ui.notesList)
+                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.notesList)
                 
-                if self.settings['Tooltips']:
+                if self.settings['Bool']['Tooltips']:
                     text = note.getText()
                     if self.notebook.markup == 'Wiki': 
                         html = text2html(unicode(text, 'utf'))
@@ -609,7 +684,7 @@ class Application(Qt.QObject):
         tab.ui.date.setText('%d-%d-%d' % localtime()[:3])
         self.mainWindow.ui.tabWidget.addTab(tab, name)
         self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
-        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/note.png'))
+        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
         tab.ui.nameEdit.setFocus()
     
     def openNote(self, entry):
@@ -640,14 +715,14 @@ class Application(Qt.QObject):
     
         if note.notebook.backend.Tag:
             for tag in note.getTags():
-                item = Qt.QListWidgetItem(Qt.QIcon(':/tag.png'), unicode(tag, 'utf'), tab.ui.tagsList)
+                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(tag, 'utf'), tab.ui.tagsList)
                 notes = self.notebook.getNotesByTag(tag)
                 item.setToolTip(self.trUtf8('Tag: %s<br>Notes (%i): %s' % (tag, len(notes), ', '.join(notes))))
 
         self.mainWindow.ui.tabWidget.addTab(tab, "")
         self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
         self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
-        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/note.png'))
+        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
         
         # If search was performed:
         if self.parameter[0] == self.notebook.search:
@@ -847,8 +922,7 @@ class Application(Qt.QObject):
         if self.notebook.markup == 'Wiki':
             ft = '* '
             et = ''
-            fl = ''
-            el = ''
+            fl = el = ''
         else:
             ft = '<li>'
             et = '</li>'

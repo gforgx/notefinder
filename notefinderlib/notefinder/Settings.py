@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI/settings.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/settings.ui'
 #
-# Created: Mon Oct 27 20:15:20 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Wed Nov 26 21:20:04 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -13,7 +13,7 @@ class Ui_SettingsDialog(object):
     def setupUi(self, SettingsDialog):
         SettingsDialog.setObjectName("SettingsDialog")
         SettingsDialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        SettingsDialog.resize(323, 257)
+        SettingsDialog.resize(323, 294)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/preferences.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         SettingsDialog.setWindowIcon(icon)
@@ -45,9 +45,24 @@ class Ui_SettingsDialog(object):
         self.trayIcon = QtGui.QCheckBox(self.tab)
         self.trayIcon.setObjectName("trayIcon")
         self.verticalLayout.addWidget(self.trayIcon)
+        self.horizontalLayout = QtGui.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label_2 = QtGui.QLabel(self.tab)
+        self.label_2.setObjectName("label_2")
+        self.horizontalLayout.addWidget(self.label_2)
+        self.themeEdit = QtGui.QComboBox(self.tab)
+        self.themeEdit.setObjectName("themeEdit")
+        self.themeEdit.addItem(QtCore.QString())
+        self.themeEdit.addItem(QtCore.QString())
+        self.themeEdit.addItem(QtCore.QString())
+        self.horizontalLayout.addWidget(self.themeEdit)
+        self.applyThemeButton = QtGui.QToolButton(self.tab)
+        self.applyThemeButton.setObjectName("applyThemeButton")
+        self.horizontalLayout.addWidget(self.applyThemeButton)
+        self.verticalLayout.addLayout(self.horizontalLayout)
         spacerItem = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout.addItem(spacerItem)
-        self.tabWidget.addTab(self.tab, icon, "")
+        self.tabWidget.addTab(self.tab, "")
         self.tab_4 = QtGui.QWidget()
         self.tab_4.setObjectName("tab_4")
         self.verticalLayout_3 = QtGui.QVBoxLayout(self.tab_4)
@@ -60,9 +75,7 @@ class Ui_SettingsDialog(object):
         self.verticalLayout_3.addWidget(self.searchOnTheFly)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/search.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tabWidget.addTab(self.tab_4, icon1, "")
+        self.tabWidget.addTab(self.tab_4, "")
         self.tab_3 = QtGui.QWidget()
         self.tab_3.setObjectName("tab_3")
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.tab_3)
@@ -75,9 +88,7 @@ class Ui_SettingsDialog(object):
         self.verticalLayout_2.addWidget(self.label)
         spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem2)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/rename.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tabWidget.addTab(self.tab_3, icon2, "")
+        self.tabWidget.addTab(self.tab_3, "")
         self.tab_2 = QtGui.QWidget()
         self.tab_2.setObjectName("tab_2")
         self.gridLayout_2 = QtGui.QGridLayout(self.tab_2)
@@ -103,6 +114,11 @@ class Ui_SettingsDialog(object):
         self.showDates.setText(QtGui.QApplication.translate("SettingsDialog", "Show dates", None, QtGui.QApplication.UnicodeUTF8))
         self.toolTips.setText(QtGui.QApplication.translate("SettingsDialog", "Show tooltips", None, QtGui.QApplication.UnicodeUTF8))
         self.trayIcon.setText(QtGui.QApplication.translate("SettingsDialog", "Tray icon", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_2.setText(QtGui.QApplication.translate("SettingsDialog", "Icon theme: ", None, QtGui.QApplication.UnicodeUTF8))
+        self.themeEdit.setItemText(0, QtGui.QApplication.translate("SettingsDialog", "default", None, QtGui.QApplication.UnicodeUTF8))
+        self.themeEdit.setItemText(1, QtGui.QApplication.translate("SettingsDialog", "oxygen", None, QtGui.QApplication.UnicodeUTF8))
+        self.themeEdit.setItemText(2, QtGui.QApplication.translate("SettingsDialog", "tango", None, QtGui.QApplication.UnicodeUTF8))
+        self.applyThemeButton.setText(QtGui.QApplication.translate("SettingsDialog", "Apply", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("SettingsDialog", "Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.searchCompletion.setText(QtGui.QApplication.translate("SettingsDialog", "Search completion", None, QtGui.QApplication.UnicodeUTF8))
         self.searchOnTheFly.setText(QtGui.QApplication.translate("SettingsDialog", "Search on-the-fly", None, QtGui.QApplication.UnicodeUTF8))

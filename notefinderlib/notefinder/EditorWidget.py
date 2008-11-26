@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI/editor_widget.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/editor_widget.ui'
 #
-# Created: Thu Oct 23 20:26:57 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Tue Nov 25 19:33:02 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -29,21 +29,12 @@ class Ui_Form(object):
         self.nameEdit.setObjectName("nameEdit")
         self.gridLayout_3.addWidget(self.nameEdit, 1, 1, 1, 1)
         self.addTagButton = QtGui.QToolButton(self.frame)
-        icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/new.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.addTagButton.setIcon(icon)
         self.addTagButton.setObjectName("addTagButton")
         self.gridLayout_3.addWidget(self.addTagButton, 4, 4, 1, 1)
         self.delTagButton = QtGui.QToolButton(self.frame)
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/list-remove.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.delTagButton.setIcon(icon1)
         self.delTagButton.setObjectName("delTagButton")
         self.gridLayout_3.addWidget(self.delTagButton, 4, 5, 1, 1)
         self.autoTagButton = QtGui.QToolButton(self.frame)
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/tag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.autoTagButton.setIcon(icon2)
         self.autoTagButton.setObjectName("autoTagButton")
         self.gridLayout_3.addWidget(self.autoTagButton, 4, 2, 1, 1)
         self.tagsList = QtGui.QListWidget(self.frame)
@@ -110,7 +101,6 @@ class Ui_Form(object):
         self.delTagButton.setText(QtGui.QApplication.translate("Form", "-", None, QtGui.QApplication.UnicodeUTF8))
         self.delTagButton.setShortcut(QtGui.QApplication.translate("Form", "Del", None, QtGui.QApplication.UnicodeUTF8))
         self.autoTagButton.setToolTip(QtGui.QApplication.translate("Form", "Assign tags automatically", None, QtGui.QApplication.UnicodeUTF8))
-        self.autoTagButton.setText(QtGui.QApplication.translate("Form", "...", None, QtGui.QApplication.UnicodeUTF8))
         self.dateLabel.setText(QtGui.QApplication.translate("Form", "Date", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.view), QtGui.QApplication.translate("Form", "Rich Text", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.edit), QtGui.QApplication.translate("Form", "Wiki source", None, QtGui.QApplication.UnicodeUTF8))

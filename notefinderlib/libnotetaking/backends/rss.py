@@ -32,6 +32,7 @@
 try:
     from feedparser import parse
     RSSParser = True
+
 except ImportError:
     RSSParser = False
 

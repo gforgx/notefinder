@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI/about.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/about.ui'
 #
-# Created: Wed Oct 22 15:29:32 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Tue Nov 25 19:30:01 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -20,7 +20,7 @@ class Ui_AboutDialog(object):
         self.vboxlayout = QtGui.QVBoxLayout(AboutDialog)
         self.vboxlayout.setObjectName("vboxlayout")
         self.logoLabel = QtGui.QLabel(AboutDialog)
-        self.logoLabel.setPixmap(QtGui.QPixmap(":/logo.png"))
+        self.logoLabel.setPixmap(QtGui.QPixmap(":/icons/logo.png"))
         self.logoLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.logoLabel.setObjectName("logoLabel")
         self.vboxlayout.addWidget(self.logoLabel)

@@ -35,7 +35,6 @@ class Zim(object):
     """ Backend for using Zim database """
 
     desc = 'Backend for using Zim database'
-    ReadOnly = False
 
     ### SETTINGS DESCRIPTION ###
     path = True

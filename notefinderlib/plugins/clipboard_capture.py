@@ -30,7 +30,7 @@
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from notefinderlib.notefinder import plugin, notefinder_rc
-from PyQt4 import QtCore, QtGui
+from PyQt4 import Qt
 from datetime import datetime
 from notefinderlib.libnotetaking import *
 
@@ -42,13 +42,13 @@ class ClipboardCapture(plugin.Plugin):
         plugin.Plugin.__init__(self, parent)
         self.setText("Capture clipboard")
         self.setToolTip("Capture clipboard")
-        self.setIcon(QtGui.QIcon(":/paste.png"))
+        self.setIcon(Qt.QIcon(':/icons/%s/paste.png' % (self.app.settings['String']['Icons'])))
         self.addToTray()
         
     def do(self):
-        cb = QtGui.QApplication.clipboard()
+        cb = Qt.QApplication.clipboard()
         text = str(cb.text().toUtf8())
         name = 'New note %s' % (datetime.strftime(datetime.today(),'%Y-%m-%d %H-%M-%S'))
         note = Note(name, self.app.notebook)
         note.write(text)
-        self.emit(QtCore.SIGNAL("done()"))
+        self.emit(Qt.SIGNAL("done()"))

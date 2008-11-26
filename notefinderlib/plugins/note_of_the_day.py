@@ -31,7 +31,7 @@
 
 from time import localtime
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import Qt
 
 from notefinderlib.libnotetaking import *
 from notefinderlib.notefinder import plugin, notefinder_rc
@@ -44,14 +44,14 @@ class NoteOfTheDay(plugin.Plugin):
         plugin.Plugin.__init__(self, parent)
         self.setText("Note of the day")
         self.setToolTip("Open note of the day")
-        self.setIcon(QtGui.QIcon(":/calendar.png"))
+        self.setIcon(Qt.QIcon(':/icons/%s/date.png' % (self.app.settings['String']['Icons'])))
         self.addToTray()
         
     def onLoad(self):
         note = Note('%d-%d-%d' % localtime()[:3], self.app.notebook)
         if not note.exists():
             note.write("**Notes and thoughts for %s**\n----" % ('%d-%d-%d' % localtime()[:3]))
-            self.emit(QtCore.SIGNAL("done()"))
+            self.emit(Qt.SIGNAL("done()"))
     
     def do(self):
         self.onLoad()

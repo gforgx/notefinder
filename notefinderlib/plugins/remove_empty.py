@@ -30,7 +30,7 @@
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import Qt
 
 from notefinderlib.libnotetaking import *
 
@@ -44,12 +44,12 @@ class RemoveEmpty(plugin.Plugin):
         plugin.Plugin.__init__(self, parent)
         self.setText("Remove empty entries")
         self.setToolTip("Remove all empty entries")
-        self.setIcon(QtGui.QIcon(":/clear.png"))
+        self.setIcon(Qt.QIcon(':/icons/%s/clear.png' % (self.app.settings['String']['Icons'])))
     
     def do(self):
         for note in self.app.notebook.getNotes():
             obj = Note(note, self.app.notebook)
             if obj.getLength() == 0:
                 obj.delete()
-        self.emit(QtCore.SIGNAL("done()"))
+        self.emit(Qt.SIGNAL("done()"))
             

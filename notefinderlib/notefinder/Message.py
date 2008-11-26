@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'message.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/message.ui'
 #
-# Created: Thu Oct  9 19:54:59 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Tue Nov 25 19:34:17 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -25,7 +25,6 @@ class Ui_MessageDialog(object):
         self.message.setObjectName("message")
         self.gridLayout.addWidget(self.message, 0, 1, 1, 1)
         self.iconLabel = QtGui.QLabel(MessageDialog)
-        self.iconLabel.setPixmap(QtGui.QPixmap(":/icon_small.png"))
         self.iconLabel.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
         self.iconLabel.setObjectName("iconLabel")
         self.gridLayout.addWidget(self.iconLabel, 0, 0, 1, 1)

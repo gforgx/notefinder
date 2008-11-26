@@ -36,12 +36,18 @@ from notefinderlib.creoleparser import text2html
 
 from notefinderlib.notefinder.EditorWidget import Ui_Form
 
+from notefinderlib.notefinder import notefinder_rc
+
 class EditorWidget(Qt.QWidget):
     def __init__(self, app):
         Qt.QWidget.__init__(self)
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         self.app = app
+        
+        self.ui.autoTagButton.setIcon(Qt.QIcon(':/icons/%s/tag.png' % (self.app.settings['String']['Icons'])))
+        self.ui.addTagButton.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.app.settings['String']['Icons'])))
+        self.ui.delTagButton.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.app.settings['String']['Icons'])))
 
         self.connect(self.ui.addTagButton, Qt.SIGNAL('clicked()'), self.addTag)
         self.connect(self.ui.tagEdit.lineEdit(), Qt.SIGNAL('returnPressed()'), self.addTag)
@@ -72,7 +78,7 @@ class EditorWidget(Qt.QWidget):
         if not line == '' and not line in self.tags():
             notes = self.app.notebook.getNotesByTag(line)
 
-            item = Qt.QListWidgetItem(Qt.QIcon(':/tag.png'), unicode(line, 'utf'), self.ui.tagsList)
+            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.app.settings['String']['Icons'])), unicode(line, 'utf'), self.ui.tagsList)
             item.setToolTip(self.trUtf8('Notes (%i): %s' % (len(notes), ', '.join(notes))))
     
             self.ui.tagEdit.lineEdit().clear()
@@ -111,5 +117,5 @@ class EditorWidget(Qt.QWidget):
             html = text2html(unicode(text, 'utf'))
 
         self.ui.textBrowser.setHtml(self.trUtf8(html))
-        if self.app.settings["AutoSave"]:
+        if self.app.settings['Bool']['AutoSave']:
             self.app.saveNote()

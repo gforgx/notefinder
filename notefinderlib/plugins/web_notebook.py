@@ -33,7 +33,7 @@
 import sys
 
 from notefinderlib.notefinder import plugin, notefinder_rc
-from PyQt4 import QtCore, QtGui
+from PyQt4 import Qt
 
 from notefinderlib.libnotetaking import *
 from notefinderlib.creoleparser import text2html
@@ -63,12 +63,12 @@ class WebNotebook(plugin.Plugin):
         plugin.Plugin.__init__(self, parent)
         self.setText("Web Notebook")
         self.setToolTip("Create web notebook")
-        self.setIcon(QtGui.QIcon(":/import_web.png"))
+        self.setIcon(Qt.QIcon(':/icons/%s/export.png' % (self.app.settings['String']['Icons'])))
         self.addToTray()
    
     def do(self):
         # Show filechooser
-        fileDialog = QtGui.QFileDialog()
+        fileDialog = Qt.QFileDialog()
         fileDialog.setWindowTitle(self.trUtf8("Select path"))
         fileDialog.setFileMode(fileDialog.Directory)
         fileDialog.exec_()

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'delete.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/delete.ui'
 #
-# Created: Thu Oct  9 19:52:52 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Tue Nov 25 19:31:42 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -33,7 +33,6 @@ class Ui_DeleteDialog(object):
         self.deleteLabel.setObjectName("deleteLabel")
         self.gridLayout.addWidget(self.deleteLabel, 0, 1, 1, 1)
         self.label = QtGui.QLabel(DeleteDialog)
-        self.label.setPixmap(QtGui.QPixmap(":/list-remove_small.png"))
         self.label.setObjectName("label")
         self.gridLayout.addWidget(self.label, 0, 0, 1, 1)
 

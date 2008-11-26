@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'UI/notebook.ui'
+# Form implementation generated from reading ui file '/home/gforgx/UI_I/notebook.ui'
 #
-# Created: Sat Nov  8 21:35:50 2008
-#      by: PyQt4 UI code generator 4.4.3
+# Created: Tue Nov 25 19:34:42 2008
+#      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
 
