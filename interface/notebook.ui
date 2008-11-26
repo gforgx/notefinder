@@ -1,0 +1,200 @@
+<ui version="4.0" >
+ <class>NotebookDialog</class>
+ <widget class="QDialog" name="NotebookDialog" >
+  <property name="windowModality" >
+   <enum>Qt::ApplicationModal</enum>
+  </property>
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>361</width>
+    <height>310</height>
+   </rect>
+  </property>
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Minimum" hsizetype="Fixed" >
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle" >
+   <string>Add notebook</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset resource="notefinder.qrc" >
+    <normaloff>:/x-office-address-book.png</normaloff>:/x-office-address-book.png</iconset>
+  </property>
+  <layout class="QGridLayout" name="gridLayout" >
+   <property name="sizeConstraint" >
+    <enum>QLayout::SetMinimumSize</enum>
+   </property>
+   <item row="1" column="0" >
+    <widget class="QLabel" name="icon" >
+     <property name="text" >
+      <string/>
+     </property>
+     <property name="pixmap" >
+      <pixmap resource="notefinder.qrc" >:/notebook_small.png</pixmap>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="2" >
+    <widget class="QLabel" name="label" >
+     <property name="text" >
+      <string>&lt;b>Add new notebook&lt;/b></string>
+     </property>
+     <property name="alignment" >
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1" >
+    <widget class="QLabel" name="backend" >
+     <property name="text" >
+      <string>Backend: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" >
+    <widget class="QComboBox" name="backends" />
+   </item>
+   <item row="2" column="1" >
+    <widget class="QLabel" name="name" >
+     <property name="text" >
+      <string>Name: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" >
+    <widget class="QLineEdit" name="nameEdit" />
+   </item>
+   <item row="6" column="1" >
+    <widget class="QLabel" name="path" >
+     <property name="text" >
+      <string>Path: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2" >
+    <widget class="QLineEdit" name="pathEdit" />
+   </item>
+   <item row="7" column="1" >
+    <widget class="QLabel" name="url" >
+     <property name="text" >
+      <string>URL: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2" >
+    <widget class="QLineEdit" name="urlEdit" >
+     <property name="text" >
+      <string>http://</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2" >
+    <widget class="QLineEdit" name="loginEdit" />
+   </item>
+   <item row="8" column="1" >
+    <widget class="QLabel" name="login" >
+     <property name="text" >
+      <string>Login:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="2" >
+    <widget class="QDialogButtonBox" name="buttonBox" >
+     <property name="orientation" >
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons" >
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1" >
+    <widget class="QLabel" name="passwd" >
+     <property name="text" >
+      <string>Password: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2" >
+    <widget class="QLineEdit" name="passwdEdit" >
+     <property name="echoMode" >
+      <enum>QLineEdit::Password</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2" >
+    <widget class="QLabel" name="desc" >
+     <property name="text" >
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1" >
+    <widget class="QLabel" name="label_2" >
+     <property name="text" >
+      <string>Markup engine</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" >
+    <widget class="QComboBox" name="markups" >
+     <item>
+      <property name="text" >
+       <string>Wiki</string>
+      </property>
+     </item>
+     <item>
+      <property name="text" >
+       <string>HTML</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="notefinder.qrc" />
+ </resources>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>NotebookDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>NotebookDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

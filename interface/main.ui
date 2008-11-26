@@ -1,0 +1,505 @@
+<ui version="4.0" >
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1000</width>
+    <height>619</height>
+   </rect>
+  </property>
+  <property name="windowTitle" >
+   <string>NoteFinder</string>
+  </property>
+  <property name="windowIcon" >
+   <iconset>
+    <normaloff>:/icon.png</normaloff>:/icon.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget" >
+   <layout class="QGridLayout" name="gridLayout_2" >
+    <property name="margin" >
+     <number>0</number>
+    </property>
+    <property name="spacing" >
+     <number>0</number>
+    </property>
+    <item row="0" column="0" >
+     <widget class="QTabWidget" name="tabWidget" >
+      <property name="tabPosition" >
+       <enum>QTabWidget::North</enum>
+      </property>
+      <property name="tabShape" >
+       <enum>QTabWidget::Rounded</enum>
+      </property>
+      <property name="currentIndex" >
+       <number>0</number>
+      </property>
+      <property name="elideMode" >
+       <enum>Qt::ElideMiddle</enum>
+      </property>
+      <widget class="QWidget" name="entriesTab" >
+       <attribute name="title" >
+        <string>Start</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout" >
+        <property name="margin" >
+         <number>1</number>
+        </property>
+        <property name="spacing" >
+         <number>1</number>
+        </property>
+        <item row="0" column="0" >
+         <widget class="QSplitter" name="splitter" >
+          <property name="frameShadow" >
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation" >
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="handleWidth" >
+           <number>3</number>
+          </property>
+          <widget class="QWidget" name="layoutWidget" >
+           <layout class="QVBoxLayout" name="verticalLayout_2" >
+            <property name="spacing" >
+             <number>3</number>
+            </property>
+            <item>
+             <widget class="QDateEdit" name="dateEdit" >
+              <property name="accelerated" >
+               <bool>false</bool>
+              </property>
+              <property name="displayFormat" >
+               <string>yyyy-M-d</string>
+              </property>
+              <property name="calendarPopup" >
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="metaList" />
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="layoutWidget" >
+           <layout class="QVBoxLayout" name="verticalLayout" >
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout" >
+              <item>
+               <widget class="QLabel" name="searchLabel" >
+                <property name="text" >
+                 <string>Search: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="searchEdit" />
+              </item>
+              <item>
+               <widget class="QToolButton" name="saveSearchButton" >
+                <property name="text" >
+                 <string>Save</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QListWidget" name="notesList" >
+              <property name="selectionMode" >
+               <enum>QAbstractItemView::ExtendedSelection</enum>
+              </property>
+              <property name="layoutMode" >
+               <enum>QListView::Batched</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="numberLabel" >
+              <property name="text" >
+               <string/>
+              </property>
+             </widget>
+            </item>
+           </layout>
+           <zorder>notesList</zorder>
+           <zorder>numberLabel</zorder>
+           <zorder></zorder>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar" />
+  <widget class="QMenuBar" name="menuBar" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1000</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuNoteFinder" >
+    <property name="title" >
+     <string>Note&amp;Finder</string>
+    </property>
+    <addaction name="actionPreferences" />
+    <addaction name="separator" />
+    <addaction name="actionExit" />
+   </widget>
+   <widget class="QMenu" name="menuEntry" >
+    <property name="title" >
+     <string>Ent&amp;ries</string>
+    </property>
+    <addaction name="actionNew" />
+    <addaction name="actionDelete" />
+    <addaction name="separator" />
+    <addaction name="actionCopyEntry" />
+    <addaction name="actionRename" />
+    <addaction name="separator" />
+    <addaction name="actionE_Mail" />
+    <addaction name="separator" />
+    <addaction name="actionBacklinks" />
+    <addaction name="actionFindRelated" />
+    <addaction name="separator" />
+    <addaction name="actionCreateIndex" />
+    <addaction name="actionMerge" />
+    <addaction name="separator" />
+    <addaction name="actionOpenExternally" />
+   </widget>
+   <widget class="QMenu" name="menuView" >
+    <property name="title" >
+     <string>&amp;Show</string>
+    </property>
+    <addaction name="actionAll" />
+    <addaction name="actionToday" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuPlugins" >
+    <property name="title" >
+     <string>&amp;Plugins</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp" >
+    <property name="title" >
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionAbout" />
+    <addaction name="actionAboutQt" />
+   </widget>
+   <widget class="QMenu" name="menuTag" >
+    <property name="title" >
+     <string>Ta&amp;gs</string>
+    </property>
+    <addaction name="actionAddTag" />
+    <addaction name="actionDeleteTag" />
+   </widget>
+   <widget class="QMenu" name="menuNotebooks" >
+    <property name="title" >
+     <string>&amp;Notebooks</string>
+    </property>
+    <addaction name="actionAddNotebook" />
+    <addaction name="actionDeleteNotebook" />
+    <addaction name="separator" />
+   </widget>
+   <widget class="QMenu" name="menuEdit" >
+    <property name="title" >
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionBold" />
+    <addaction name="actionItalic" />
+    <addaction name="actionUnderlined" />
+    <addaction name="actionHighlight" />
+    <addaction name="actionBulletedList" />
+    <addaction name="actionImage" />
+    <addaction name="actionTimestamp" />
+   </widget>
+   <addaction name="menuNoteFinder" />
+   <addaction name="menuEdit" />
+   <addaction name="menuNotebooks" />
+   <addaction name="menuTag" />
+   <addaction name="menuEntry" />
+   <addaction name="menuView" />
+   <addaction name="menuPlugins" />
+   <addaction name="menuHelp" />
+  </widget>
+  <widget class="QToolBar" name="mainToolbar" >
+   <property name="windowTitle" >
+    <string>Main</string>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionNew" />
+   <addaction name="actionSave" />
+   <addaction name="actionAll" />
+   <addaction name="actionToday" />
+  </widget>
+  <widget class="QToolBar" name="editToolbar" >
+   <property name="windowTitle" >
+    <string>Edit</string>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionBold" />
+   <addaction name="actionItalic" />
+   <addaction name="actionUnderlined" />
+   <addaction name="actionHighlight" />
+   <addaction name="actionBulletedList" />
+   <addaction name="actionImage" />
+   <addaction name="actionTimestamp" />
+  </widget>
+  <widget class="QToolBar" name="pluginsToolbar" >
+   <property name="windowTitle" >
+    <string>Plugins</string>
+   </property>
+   <property name="iconSize" >
+    <size>
+     <width>16</width>
+     <height>16</height>
+    </size>
+   </property>
+   <attribute name="toolBarArea" >
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak" >
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actionAbout" >
+   <property name="text" >
+    <string>About</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="actionNew" >
+   <property name="text" >
+    <string>Add</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+N</string>
+   </property>
+  </action>
+  <action name="actionDelete" >
+   <property name="text" >
+    <string>Delete</string>
+   </property>
+   <property name="shortcut" >
+    <string>Del</string>
+   </property>
+  </action>
+  <action name="actionToday" >
+   <property name="text" >
+    <string>Today</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+T</string>
+   </property>
+  </action>
+  <action name="actionAll" >
+   <property name="text" >
+    <string>All notes</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionFindRelated" >
+   <property name="text" >
+    <string>Find related notes</string>
+   </property>
+  </action>
+  <action name="actionExit" >
+   <property name="text" >
+    <string>Quit</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionAddTag" >
+   <property name="text" >
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="actionDeleteTag" >
+   <property name="text" >
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionDeleteSelectedSearch" >
+   <property name="text" >
+    <string>Delete selected search</string>
+   </property>
+  </action>
+  <action name="actionE_Mail" >
+   <property name="text" >
+    <string>E-Mail</string>
+   </property>
+  </action>
+  <action name="actionRename" >
+   <property name="text" >
+    <string>Rename</string>
+   </property>
+   <property name="shortcut" >
+    <string>F2</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionSave" >
+   <property name="text" >
+    <string>Save</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionBold" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Bold</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+B</string>
+   </property>
+  </action>
+  <action name="actionItalic" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="checked" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Italic</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionUnderlined" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Underlined</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+U</string>
+   </property>
+  </action>
+  <action name="actionHighlight" >
+   <property name="checkable" >
+    <bool>false</bool>
+   </property>
+   <property name="text" >
+    <string>Highlight</string>
+   </property>
+   <property name="shortcutContext" >
+    <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="actionTimestamp" >
+   <property name="text" >
+    <string>Timestamp</string>
+   </property>
+  </action>
+  <action name="actionDeleteNotebook" >
+   <property name="text" >
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actionAddNotebook" >
+   <property name="text" >
+    <string>Add</string>
+   </property>
+  </action>
+  <action name="actionCopyEntry" >
+   <property name="text" >
+    <string>Copy to another notebooks</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+Shift+C</string>
+   </property>
+  </action>
+  <action name="actionBacklinks" >
+   <property name="text" >
+    <string>Backlinks</string>
+   </property>
+  </action>
+  <action name="actionCreateIndex" >
+   <property name="text" >
+    <string>Create index</string>
+   </property>
+  </action>
+  <action name="actionMerge" >
+   <property name="text" >
+    <string>Merge</string>
+   </property>
+  </action>
+  <action name="actionPreferences" >
+   <property name="text" >
+    <string>Preferences</string>
+   </property>
+   <property name="shortcut" >
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="actionOpenExternally" >
+   <property name="text" >
+    <string>Open externally</string>
+   </property>
+  </action>
+  <action name="actionAboutQt" >
+   <property name="text" >
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionImage" >
+   <property name="text" >
+    <string>Image</string>
+   </property>
+  </action>
+  <action name="actionBulletedList" >
+   <property name="text" >
+    <string>Bulleted List</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="notefinder.qrc" />
+ </resources>
+ <connections/>
+</ui>
