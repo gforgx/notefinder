@@ -98,7 +98,7 @@ class Application(Qt.QObject):
                 'Tooltips' : True,
             },
             'String': {
-                'Icons' : 'default'
+                'Icons' : 'silk'
             }
         }
 
@@ -591,11 +591,15 @@ class Application(Qt.QObject):
         if item.type == 'tag':
             self.parameter = [self.notebook.getNotesByTag, str(item.text().toUtf8())]
             self.display(self.parameter)
+            desc = self.parameter[1]
         elif item.type == 'date':
             self.parameter = [self.notebook.getNotesByDate, str(item.text().toUtf8())]
             self.display(self.parameter)
+            desc = self.parameter[1]
         elif item.type == 'search':
-            self.search(item.text())
+            i = item.text()
+            self.search(i)
+            desc = str(i.toUtf8())
         elif item.type == 'notebook':
             name = str(item.text().toUtf8())
             try:
@@ -603,8 +607,11 @@ class Application(Qt.QObject):
                 self.parameter = [self.notebook.getNotes]
                 self.refresh()
                 self.emit(Qt.SIGNAL('notebookChanged()'))
+                desc = 'All'
             except Exception, err:
                 self.showMessage(str(err))
+        
+        self.mainWindow.ui.tabWidget.setTabText(0, unicode('%s > %s' % (self.notebook.name, desc)))
     
     def openDate(self):
         date = self.mainWindow.ui.dateEdit.date()
