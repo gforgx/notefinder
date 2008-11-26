@@ -412,11 +412,12 @@ class Application(Qt.QObject):
 
         # Dialogs
         self.deleteDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
+        self.addTagDialog.ui.iconLabel.setPixmap(Qt.QPixmap(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
         self.deleteTagDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
         self.deleteNotebookDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
         self.renameDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/rename.png' % (self.settings['String']['Icons'])))
         self.notebookDialog.ui.icon.setPixmap(Qt.QPixmap(':/icons/%s/small/notebook.png' % (self.settings['String']['Icons'])))
-        self.messageDialog.ui.iconLabel.setPixmap(Qt.QPixmap(':/icons/icon.png'))
+        self.messageDialog.ui.iconLabel.setPixmap(Qt.QPixmap(':/icons/icon_small.png'))
         self.settingsDialog.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/icon.png'))
         self.settingsDialog.ui.tabWidget.setTabIcon(1, Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
         self.settingsDialog.ui.tabWidget.setTabIcon(2, Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])))
