@@ -66,7 +66,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.2.6'
+__version__ = '0.3.5'
 
 class Application(Qt.QObject):
     def __init__(self):
@@ -222,7 +222,7 @@ class Application(Qt.QObject):
         self.menu.addAction(self.mainWindow.ui.actionPreferences)
         self.menu.addAction(self.mainWindow.ui.actionExit)
         self.tray.setContextMenu(self.menu)
-        self.tray.setIcon(Qt.QIcon(':/icon.png'))
+        self.tray.setIcon(Qt.QIcon(':/icons/icon.png'))
         
         # Other dialogs
         self.aboutDialog = Qt.QDialog()
@@ -679,7 +679,7 @@ class Application(Qt.QObject):
         if name is None:
             name = 'New note %s' % (datetime.strftime(datetime.today(), '%Y-%m-%d %H-%M-%S'))
         if not text is None:
-            tab.ui.textEdit.setText(self.trUtf8(text))
+            tab.ui.textEdit.setText(unicode(text, 'utf'))
     
         for i in (tab.ui.tagEdit,tab.ui.tagsList, tab.ui.addTagButton,tab.ui.delTagButton, tab.ui.autoTagButton):
             i.setHidden(not self.notebook.backend.Tag)

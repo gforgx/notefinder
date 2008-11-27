@@ -91,7 +91,7 @@ class Config(ConfigParser.ConfigParser):
     def deleteNotebook(self, name):
         self.remove_option('Notebooks', name)
         self.remove_option(self.getBackend(name), name)
-        self.remove_option(self.get('Markup', name), name)
+        self.remove_option('Markup', name)
 
         self.write(open(self.file, 'w'))
     
