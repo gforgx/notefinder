@@ -98,6 +98,11 @@
            </item>
            <item>
             <property name="text" >
+             <string>silk</string>
+            </property>
+           </item>
+           <item>
+            <property name="text" >
              <string>tango</string>
             </property>
            </item>

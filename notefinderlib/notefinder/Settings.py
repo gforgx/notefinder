@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI_I/settings.ui'
+# Form implementation generated from reading ui file 'interface/settings.ui'
 #
-# Created: Wed Nov 26 21:20:04 2008
+# Created: Thu Nov 27 18:21:45 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -52,6 +52,7 @@ class Ui_SettingsDialog(object):
         self.horizontalLayout.addWidget(self.label_2)
         self.themeEdit = QtGui.QComboBox(self.tab)
         self.themeEdit.setObjectName("themeEdit")
+        self.themeEdit.addItem(QtCore.QString())
         self.themeEdit.addItem(QtCore.QString())
         self.themeEdit.addItem(QtCore.QString())
         self.themeEdit.addItem(QtCore.QString())
@@ -117,7 +118,8 @@ class Ui_SettingsDialog(object):
         self.label_2.setText(QtGui.QApplication.translate("SettingsDialog", "Icon theme: ", None, QtGui.QApplication.UnicodeUTF8))
         self.themeEdit.setItemText(0, QtGui.QApplication.translate("SettingsDialog", "default", None, QtGui.QApplication.UnicodeUTF8))
         self.themeEdit.setItemText(1, QtGui.QApplication.translate("SettingsDialog", "oxygen", None, QtGui.QApplication.UnicodeUTF8))
-        self.themeEdit.setItemText(2, QtGui.QApplication.translate("SettingsDialog", "tango", None, QtGui.QApplication.UnicodeUTF8))
+        self.themeEdit.setItemText(2, QtGui.QApplication.translate("SettingsDialog", "silk", None, QtGui.QApplication.UnicodeUTF8))
+        self.themeEdit.setItemText(3, QtGui.QApplication.translate("SettingsDialog", "tango", None, QtGui.QApplication.UnicodeUTF8))
         self.applyThemeButton.setText(QtGui.QApplication.translate("SettingsDialog", "Apply", None, QtGui.QApplication.UnicodeUTF8))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), QtGui.QApplication.translate("SettingsDialog", "Interface", None, QtGui.QApplication.UnicodeUTF8))
         self.searchCompletion.setText(QtGui.QApplication.translate("SettingsDialog", "Search completion", None, QtGui.QApplication.UnicodeUTF8))
