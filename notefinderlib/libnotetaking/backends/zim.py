@@ -43,6 +43,7 @@ class Zim(object):
     passwd = False
 
     ### FEATURE SET ###
+    Date = False
     Tag = False
     ReadOnly = False
     URL = True

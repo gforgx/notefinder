@@ -49,6 +49,7 @@ class Mail(object):
     passwd = True
 
     ### FEATURE SET ###
+    Date = False
     Tag = False
     ReadOnly = True
     URL = False

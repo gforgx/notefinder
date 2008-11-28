@@ -121,6 +121,7 @@ class Application(Qt.QObject):
         self.mainWindow = Qt.QMainWindow()
         self.mainWindow.ui = Ui_MainWindow()
         self.mainWindow.ui.setupUi(self.mainWindow)
+        self.mainWindow.setWindowIcon(Qt.QIcon(':/icons/icon.png'))
         
         # Setting current date
         date = localtime()[:3]
@@ -317,6 +318,10 @@ class Application(Qt.QObject):
         self.connect(self.settingsDialog.ui.listWidget, Qt.SIGNAL('itemSelectionChanged()'), self.updatePluginMenu)
         self.connect(self.settingsDialog.ui.updatePluginAction, Qt.SIGNAL('triggered()'), self.setPlugins)
         self.connect(self.settingsDialog.ui.applyThemeButton, Qt.SIGNAL('clicked()'), self.updateIcons)
+        
+        # Bold font
+        self.boldFont = Qt.QFont()
+        self.boldFont.setBold(True)
         
         self.readSettings()
         self.applySettings()
@@ -515,6 +520,7 @@ class Application(Qt.QObject):
         for i in self.writeActions: i.setVisible(not self.notebook.backend.ReadOnly)
         for i in self.wikiActions: i.setVisible(self.notebook.Wiki)
 
+        self.mainWindow.ui.dateEdit.setVisible(self.notebook.backend.Date)
         self.mainWindow.ui.menuTag.setEnabled(self.notebook.backend.Tag)
         self.mainWindow.ui.actionOpenExternally.setVisible(self.notebook.backend.URL)
 
@@ -553,6 +559,9 @@ class Application(Qt.QObject):
                     Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.copyDialog.ui.notebooks)
                 item.setToolTip(self.trUtf8('Backend: %s' % backend))
                 item.type = 'notebook'
+                
+                if i == self.notebook.name:
+                    item.setFont(self.boldFont)
         
         if self.settings['Bool']['Dates']:
             dates = self.notebook.getDates()

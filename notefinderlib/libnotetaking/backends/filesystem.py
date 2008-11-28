@@ -44,6 +44,7 @@ class FileSystem(object):
     passwd = False
     
     ### FEATURE SET ###
+    Date = True
     Tag = True
     ReadOnly = False
     URL = True

@@ -44,6 +44,7 @@ class DokuWiki(ServerProxy):
     passwd = True
 
     ### FEATURE SET ###
+    Date = False
     Tag = False
     ReadOnly = False
     URL = True

@@ -45,6 +45,7 @@ class iCal(object):
     passwd = False
 
     ### FEATURE SET ###
+    Date = True
     Tag = False
     ReadOnly = True
     URL = False
