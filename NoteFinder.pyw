@@ -66,7 +66,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.3.5'
+__version__ = '0.3.6'
 
 class Application(Qt.QObject):
     def __init__(self):
