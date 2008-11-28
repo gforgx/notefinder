@@ -41,13 +41,6 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout" >
        <item>
-        <widget class="QCheckBox" name="showMetaPanel" >
-         <property name="text" >
-          <string>Show meta panel</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QCheckBox" name="backendIcons" >
          <property name="text" >
           <string>Show backend icons</string>

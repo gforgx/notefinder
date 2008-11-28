@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface/settings.ui'
 #
-# Created: Thu Nov 27 18:21:45 2008
+# Created: Fri Nov 28 21:53:46 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -30,9 +30,6 @@ class Ui_SettingsDialog(object):
         self.tab.setObjectName("tab")
         self.verticalLayout = QtGui.QVBoxLayout(self.tab)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.showMetaPanel = QtGui.QCheckBox(self.tab)
-        self.showMetaPanel.setObjectName("showMetaPanel")
-        self.verticalLayout.addWidget(self.showMetaPanel)
         self.backendIcons = QtGui.QCheckBox(self.tab)
         self.backendIcons.setObjectName("backendIcons")
         self.verticalLayout.addWidget(self.backendIcons)
@@ -110,7 +107,6 @@ class Ui_SettingsDialog(object):
 
     def retranslateUi(self, SettingsDialog):
         SettingsDialog.setWindowTitle(QtGui.QApplication.translate("SettingsDialog", "Preferences", None, QtGui.QApplication.UnicodeUTF8))
-        self.showMetaPanel.setText(QtGui.QApplication.translate("SettingsDialog", "Show meta panel", None, QtGui.QApplication.UnicodeUTF8))
         self.backendIcons.setText(QtGui.QApplication.translate("SettingsDialog", "Show backend icons", None, QtGui.QApplication.UnicodeUTF8))
         self.showDates.setText(QtGui.QApplication.translate("SettingsDialog", "Show dates", None, QtGui.QApplication.UnicodeUTF8))
         self.toolTips.setText(QtGui.QApplication.translate("SettingsDialog", "Show tooltips", None, QtGui.QApplication.UnicodeUTF8))

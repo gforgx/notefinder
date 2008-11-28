@@ -430,8 +430,8 @@ class Application(Qt.QObject):
         self.notebookDialog.ui.icon.setPixmap(Qt.QPixmap(':/icons/%s/small/notebook.png' % (self.settings['String']['Icons'])))
         self.messageDialog.ui.iconLabel.setPixmap(Qt.QPixmap(':/icons/icon_small.png'))
         self.settingsDialog.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/icon.png'))
-        self.settingsDialog.ui.tabWidget.setTabIcon(1, Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
-        self.settingsDialog.ui.tabWidget.setTabIcon(2, Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])))
+        self.settingsDialog.ui.tabWidget.setTabIcon(1, Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])))
+        self.settingsDialog.ui.tabWidget.setTabIcon(2, Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
         self.settingsDialog.ui.tabWidget.setTabIcon(3, Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
 
     def updateIcons(self):
@@ -452,7 +452,6 @@ class Application(Qt.QObject):
         config.set('UI', 'BackendIcons', self.settingsDialog.ui.backendIcons.isChecked())
         config.set('UI', 'SearchCompletion', self.settingsDialog.ui.searchCompletion.isChecked())
         config.set('UI', 'SearchOnTheFly', self.settingsDialog.ui.searchOnTheFly.isChecked())
-        config.set('UI', 'ShowMetaPanel', self.settingsDialog.ui.showMetaPanel.isChecked())
         config.set('UI', 'Tooltips', self.settingsDialog.ui.toolTips.isChecked())
         config.set('UI', 'TrayIcon', self.settingsDialog.ui.trayIcon.isChecked())
         config.set('UI', 'Dates', self.settingsDialog.ui.showDates.isChecked())
