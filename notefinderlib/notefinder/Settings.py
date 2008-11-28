@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface/settings.ui'
 #
-# Created: Fri Nov 28 21:53:46 2008
+# Created: Fri Nov 28 22:46:36 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -42,6 +42,9 @@ class Ui_SettingsDialog(object):
         self.trayIcon = QtGui.QCheckBox(self.tab)
         self.trayIcon.setObjectName("trayIcon")
         self.verticalLayout.addWidget(self.trayIcon)
+        self.sessions = QtGui.QCheckBox(self.tab)
+        self.sessions.setObjectName("sessions")
+        self.verticalLayout.addWidget(self.sessions)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.label_2 = QtGui.QLabel(self.tab)
@@ -111,6 +114,7 @@ class Ui_SettingsDialog(object):
         self.showDates.setText(QtGui.QApplication.translate("SettingsDialog", "Show dates", None, QtGui.QApplication.UnicodeUTF8))
         self.toolTips.setText(QtGui.QApplication.translate("SettingsDialog", "Show tooltips", None, QtGui.QApplication.UnicodeUTF8))
         self.trayIcon.setText(QtGui.QApplication.translate("SettingsDialog", "Tray icon", None, QtGui.QApplication.UnicodeUTF8))
+        self.sessions.setText(QtGui.QApplication.translate("SettingsDialog", "Sessions", None, QtGui.QApplication.UnicodeUTF8))
         self.label_2.setText(QtGui.QApplication.translate("SettingsDialog", "Icon theme: ", None, QtGui.QApplication.UnicodeUTF8))
         self.themeEdit.setItemText(0, QtGui.QApplication.translate("SettingsDialog", "default", None, QtGui.QApplication.UnicodeUTF8))
         self.themeEdit.setItemText(1, QtGui.QApplication.translate("SettingsDialog", "oxygen", None, QtGui.QApplication.UnicodeUTF8))

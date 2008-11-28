@@ -90,6 +90,7 @@ class Application(Qt.QObject):
                 'AutoSave' : True,
                 'BackendIcons' : True,
                 'Dates' : False,
+                'Sessions' : True,
                 'SearchCompletion' : True,
                 'SearchOnTheFly' : True,
                 'Toolbars' : True,
@@ -102,6 +103,9 @@ class Application(Qt.QObject):
             'Int': {
                 'SplitterLeft' : 220,
                 'SplitterRight' : 1030,
+            },
+            'List': {
+                'Session' : []
             }
         }
 
@@ -331,10 +335,10 @@ class Application(Qt.QObject):
         self.readSettings()
         self.applySettings()
         self.mainWindow.ui.splitter.setSizes([self.settings['Int']['SplitterLeft'], self.settings['Int']['SplitterRight']])
-
+        
         # Initializing notebook
         try:
-            self.setNotebook(config.getNotebook())
+            self.setNotebook(config.getNotebook(), True)
         except:
             config.addNotebook('Default', 'FileSystem', 'Wiki', [os.path.expanduser('~/.notes')])
             self.setNotebook('Default')
@@ -344,6 +348,13 @@ class Application(Qt.QObject):
         self.loadPlugins()
 
         self.refresh()
+
+        if self.settings['Bool']['Sessions']:
+            for i in self.settings['List']['Session']:
+                try:
+                    self.openNote(i)
+                except:
+                    pass
 
     def readSettings(self):
         config = Config()
@@ -365,6 +376,14 @@ class Application(Qt.QObject):
             except:
                 pass
 
+        for i in self.settings['List']:
+            try:
+                st = config.get('UI', i)
+                if not st == '':
+                    self.settings['List'][i] = config.get('UI', i).split('|||')
+            except:
+                pass
+
     def applySettings(self):
         self.settingsDialog.ui.toolTips.setChecked(self.settings['Bool']['Tooltips'])
         self.settingsDialog.ui.backendIcons.setChecked(self.settings['Bool']['BackendIcons'])
@@ -373,6 +392,8 @@ class Application(Qt.QObject):
         self.settingsDialog.ui.searchCompletion.setChecked(self.settings['Bool']['SearchCompletion'])
         self.settingsDialog.ui.searchOnTheFly.setChecked(self.settings['Bool']['SearchOnTheFly'])
         self.settingsDialog.ui.showDates.setChecked(self.settings['Bool']['Dates'])
+        self.settingsDialog.ui.sessions.setChecked(self.settings['Bool']['Sessions'])
+
 
         if self.settings['Bool']['TrayIcon']:
             self.tray.show()
@@ -452,6 +473,7 @@ class Application(Qt.QObject):
         config.set('UI', 'BackendIcons', self.settingsDialog.ui.backendIcons.isChecked())
         config.set('UI', 'SearchCompletion', self.settingsDialog.ui.searchCompletion.isChecked())
         config.set('UI', 'SearchOnTheFly', self.settingsDialog.ui.searchOnTheFly.isChecked())
+        config.set('UI', 'Sessions', self.settingsDialog.ui.sessions.isChecked())
         config.set('UI', 'Tooltips', self.settingsDialog.ui.toolTips.isChecked())
         config.set('UI', 'TrayIcon', self.settingsDialog.ui.trayIcon.isChecked())
         config.set('UI', 'Dates', self.settingsDialog.ui.showDates.isChecked())
@@ -518,7 +540,7 @@ class Application(Qt.QObject):
         self.notebookDialog.ui.desc.setText(self.trUtf8(backend.desc))
         self.notebookDialog.adjustSize()
 
-    def setNotebook(self, notebook):
+    def setNotebook(self, notebook, fr=False):
         self.notebook = Notebook(notebook)
         config.setDefault(notebook)
 
@@ -529,8 +551,22 @@ class Application(Qt.QObject):
         self.mainWindow.ui.menuTag.setEnabled(self.notebook.backend.Tag)
         self.mainWindow.ui.actionOpenExternally.setVisible(self.notebook.backend.URL)
 
+        if not fr:
+            if self.settings['Bool']['Sessions']:
+                self.settings['List']['Session'] = []
+
+                self.saveSession()
+
     def closeTab(self):
         tab = self.mainWindow.ui.tabWidget.currentIndex()
+
+        if self.settings['Bool']['Sessions']:
+            try:
+                self.settings['List']['Session'].remove(self.mainWindow.ui.tabWidget.currentWidget().note.name)
+                self.saveSession()
+            except:
+                pass
+        
         if tab != 0: self.mainWindow.ui.tabWidget.removeTab(tab)
 
     def showHide(self, reason):
@@ -745,7 +781,14 @@ class Application(Qt.QObject):
         self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
         self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
         self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
-        
+
+        if self.settings['Bool']['Sessions']:
+            if not entry in self.settings['List']['Session']:
+                self.settings['List']['Session'].append(entry)
+
+                self.saveSession()
+
+
         # If search was performed:
         if self.parameter[0] == self.notebook.search:
             if len(self.parameter[1]) == 1:
@@ -759,17 +802,24 @@ class Application(Qt.QObject):
             widget = self.currentWidget()
             text = str(widget.ui.textEdit.toPlainText().toUtf8())
             tags = widget.tags()
-            
-            if not hasattr(widget, "note"):
+
+            if not hasattr(widget, 'note'):
                 widget.note = Note(str(widget.ui.nameEdit.text().toUtf8()), self.notebook)
                 self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(widget), unicode(widget.note.name, 'utf'))
-            
+
             try:
                 widget.note.write(text)
                 widget.note.tag(tags)
-                self.emit(Qt.SIGNAL("notesModified()"))
+                self.emit(Qt.SIGNAL('notesModified()'))
                 widget.ui.nameEdit.setEnabled(False)
                 widget.refresh()
+
+                if self.settings['Bool']['Session']:
+                    if not entry in self.settings['List']['Session']:
+                        self.settings['List']['Session'].append(widget.note.name)
+
+                        self.saveSession()
+
             except:
                 self.showMessage('Failed to save entry')
 
@@ -807,7 +857,8 @@ class Application(Qt.QObject):
                 Qt.QDesktopServices().openUrl(Qt.QUrl(unicode(Note(name, self.notebook).getURL(), 'utf')))
     
     def deleteNotes(self):
-        for note in self.selectedNotes(): Note(note, self.notebook).delete()
+        for note in self.selectedNotes():
+            Note(note, self.notebook).delete()
         self.emit(Qt.SIGNAL('notesModified()'))
    
     def renameNote(self):
@@ -952,7 +1003,6 @@ class Application(Qt.QObject):
             el = '</ul>'
         
         self.insertMarkup(fl, el, text=unicode('\n'.join([ft + i + et for i in str(self.getSelection().toUtf8()).split('\xe2\x80\xa9')]), 'utf'))
-        
     
     def insertTime(self):
         self.insertMarkup('', '', datetime.strftime(datetime.today(), '%Y-%m-%d, %H:%M:%S'))
@@ -971,6 +1021,10 @@ class Application(Qt.QObject):
         config.set('UI', 'SplitterRight', r)
 
         config.write(open(config.file, 'w'))
+
+    def saveSession(self):
+        config.set('UI', 'Session', '|||'.join(self.settings['List']['Session']))
+        config.write(open(config.file, 'w'))   
 
     def run(self):
         self.mainWindow.show()
