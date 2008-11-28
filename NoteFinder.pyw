@@ -92,13 +92,16 @@ class Application(Qt.QObject):
                 'Dates' : False,
                 'SearchCompletion' : True,
                 'SearchOnTheFly' : True,
-                'ShowMetaPanel' : True,
                 'Toolbars' : True,
                 'TrayIcon' : True,
                 'Tooltips' : True,
             },
             'String': {
                 'Icons' : 'silk'
+            },
+            'Int': {
+                'SplitterLeft' : 220,
+                'SplitterRight' : 1030,
             }
         }
 
@@ -183,6 +186,8 @@ class Application(Qt.QObject):
         self.connect(self.mainWindow.ui.actionImage, Qt.SIGNAL('triggered()'), self.image)
         self.connect(self.mainWindow.ui.actionTimestamp, Qt.SIGNAL('triggered()'), self.insertTime)
         self.connect(self.mainWindow.ui.actionBulletedList, Qt.SIGNAL('triggered()'), self.list)
+
+        self.connect(self.mainWindow.ui.splitter, Qt.SIGNAL('splitterMoved (int,int)'), self.saveSizer)
 
         self.writeActions = (
             self.mainWindow.ui.actionNew,
@@ -325,6 +330,7 @@ class Application(Qt.QObject):
         
         self.readSettings()
         self.applySettings()
+        self.mainWindow.ui.splitter.setSizes([self.settings['Int']['SplitterLeft'], self.settings['Int']['SplitterRight']])
 
         # Initializing notebook
         try:
@@ -353,6 +359,12 @@ class Application(Qt.QObject):
             except:
                 pass
 
+        for i in self.settings['Int']:
+            try:
+                self.settings['Int'][i] = config.getint('UI', i)
+            except:
+                pass
+
     def applySettings(self):
         self.settingsDialog.ui.toolTips.setChecked(self.settings['Bool']['Tooltips'])
         self.settingsDialog.ui.backendIcons.setChecked(self.settings['Bool']['BackendIcons'])
@@ -360,7 +372,6 @@ class Application(Qt.QObject):
         self.settingsDialog.ui.autoSave.setChecked(self.settings['Bool']['AutoSave'])
         self.settingsDialog.ui.searchCompletion.setChecked(self.settings['Bool']['SearchCompletion'])
         self.settingsDialog.ui.searchOnTheFly.setChecked(self.settings['Bool']['SearchOnTheFly'])
-        self.settingsDialog.ui.showMetaPanel.setChecked(self.settings['Bool']['ShowMetaPanel'])
         self.settingsDialog.ui.showDates.setChecked(self.settings['Bool']['Dates'])
 
         if self.settings['Bool']['TrayIcon']:
@@ -369,11 +380,6 @@ class Application(Qt.QObject):
 
         if self.settings['Bool']['SearchOnTheFly']:
             self.connect(self.mainWindow.ui.searchEdit, Qt.SIGNAL('textChanged(const QString)'), self.search)
-    
-        if self.settings['Bool']['ShowMetaPanel']:
-            self.mainWindow.ui.splitter.setSizes([220, 1030])
-        else:
-            self.mainWindow.ui.splitter.setSizes([0, 1030])
     
         self.setIcons()
 
@@ -955,6 +961,17 @@ class Application(Qt.QObject):
     def closeEvent(self, event):
         self.mainWindow.hide()
         event.ignore()
+
+    def saveSizer(self):
+        if not config.has_section('UI'):
+            config.add_section('UI')
+        
+        l, r = self.mainWindow.ui.splitter.sizes()
+
+        config.set('UI', 'SplitterLeft', l)
+        config.set('UI', 'SplitterRight', r)
+
+        config.write(open(config.file, 'w'))
 
     def run(self):
         self.mainWindow.show()
