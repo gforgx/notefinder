@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-#       Copyright (C) 2007-2008 Simonenko Sergey <gforgx@gmail.com>
+#       Copyright (C) 2008 GFORGX <gforgx@gmail.com>
 #
 #       Redistribution and use in source and binary forms, with or without
 #       modification, are permitted provided that the following conditions are
@@ -13,7 +13,7 @@
 #       copyright notice, this list of conditions and the following disclaimer
 #       in the documentation and/or other materials provided with the
 #       distribution.
-#       * Neither the name of the project NoteFinder and author's name nor the names of 
+#       * Neither the name of the  nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
 #
@@ -30,30 +30,68 @@
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
-from setuptools import setup
+import getopt
 
-# Variables
-if sys.platform.startswith("win"): # If Windows
-	shortcut = "share/NoteFinder.lnk"
-	exec_dst = shortcut_dst = icon_dst = "C:\Program Files\NoteFinder"
-else: # If something else
-	shortcut = "share/notefinder.desktop"
-	shortcut_dst = "share/applications"
-	exec_dst = "bin"
-	icon_dst = "share/notefinder"
+from notefinderlib.libnotetaking import *
 
+# Notebook initializing
+notebook = Notebook(config.getNotebook())
 
-setup(
-        name = 'notefinder',
-        # Install general stuff
-	packages = ['notefinderlib', 'notefinderlib.libnotetaking', 'notefinderlib.libnotetaking.backends', 'notefinderlib.creoleparser', 'notefinderlib.icalendar', 'notefinderlib.notefinder', 'notefinderlib.plugins'],
-        data_files = [(shortcut_dst, [shortcut]), (exec_dst, ["notefinder", "NoteFinder.pyw"]), (icon_dst, ["share/icon.png"])],
-        entry_points = {
-            # Install plugins
-            'notefinder.plugins': [
-                'clipboard_capture = notefinderlib.plugins.clipboard_capture:ClipboardCapture',
-                'web_notebook = notefinderlib.plugins.web_notebook:WebNotebook',
-                'note_of_the_day=notefinderlib.plugins.note_of_the_day:NoteOfTheDay',
-                'remove_empty = notefinderlib.plugins.remove_empty:RemoveEmpty'
-            ],
-        })
+# Functions
+def help(x):
+    """ Display help message """
+    print '-h\tdisplay this help message\n\
+-l\tlist all notes in a notebook\n\
+-n\toutput entry text to console\n\
+-a\tadd entry with given title to a notebook\n\
+-d\tdelete entry from a notebook\n\
+-s\tset current notebook\n'
+
+def list(x):
+    """ List all notes in notebook """
+    print '\n'.join(notebook.getNotes())
+
+def note(entry):
+    """ Output entry text to console """
+    if Note(entry, notebook).exists():
+        print Note(entry, notebook).getText()
+
+def add(entry):
+    """ Add entry with given title to the notebook """
+    Note(entry, notebook).write(raw_input())
+
+def delete(entry):
+    """ Delete entry from the notebook """
+    if raw_input('Are you sure? [Y/n]\n') in ('Y', 'y'):
+        if Note(entry, notebook).exists():
+            Note(entry, notebook).delete()
+
+def set_notebook(book):
+    """ Sets current notebook """
+    if book in config.getNotebooks():
+        config.setDefault(book)
+
+# Binding actions
+actions = {
+    '-h' : help,
+    '-l'  : list,
+    '-n' : note,
+    '-a' : add,
+    '-d' : delete,
+    '-s' : set_notebook,
+}
+
+# Parsing CLI options/arguments
+try:
+
+    opts, args = getopt.getopt(sys.argv[1:], 'hln:a:d:s:', [])
+
+    for i in opts:
+        actions[i[0]](i[1])
+
+    for i in args:
+        note(i)
+
+except Exception, err:
+    print err
+    help(0)
