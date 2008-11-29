@@ -31,6 +31,7 @@
 
 # Standard library imports
 import os
+import re
 import ConfigParser
 
 # Backend imports
@@ -245,8 +246,8 @@ class Note(object):
         return (expression in self.getText())
 
     def getBacklinks(self):
-        return [note for note in self.notebook.getNotes()
-            if Note(note, self.notebook).matches('[[%s' % (self.name))]
+        return [note for note in self.notebook.getNotes() \
+                if re.compile(r'^.*\[\[%s(\|.*)?\]\].*$' % (self.name), re.DOTALL).match(Note(note, self.notebook).getText())]
 
     def getURL(self):
         return self.notebook.backend.getURL(self.name)
