@@ -61,22 +61,21 @@ class FileSystem(object):
             os.mkdir(path)
 
         # Subdirectories
-        self.path = os.path.join(path, 'date')
-        self.tagPath = os.path.join(path, 'tag')
+        self.path, self.tagPath = os.path.join(path, 'date'), os.path.join(path, 'tag')
 
-        # Creating subdirectories if not exist
+        # Creating subdirectories (date, tag) if not exist
         for i in (self.path, self.tagPath):
             if not os.path.exists(os.path.join(path, i)):
                 os.makedirs(os.path.join(path, i))
 
-    def _dateExists(self, date):
-        return (date in self.getDates())
-
-    def _tagExists(self, tag):
-        return (tag in self.getTags())
-
     def _today(self):
         return '%d-%d-%d' % localtime()[:3]
+
+    def _getPath(self, entry):
+        for date in self.getDates():
+            if entry in self.getNotesByDate(date):
+                path = os.path.join(self.path, date, entry)
+                return path
 
     def getDates(self):
         return os.listdir(self.path)
@@ -85,40 +84,33 @@ class FileSystem(object):
         return os.listdir(self.tagPath)
 
     def getURL(self, entry):
-        return 'file://' + self.getPath(entry)
+        return 'file://' + self._getPath(entry)
         
     def getNotes(self):
         notes = []
+
         for i in self.getDates():
-            notes += os.listdir(os.path.join(self.path, i))
+            notes.extend(os.listdir(os.path.join(self.path, i)))
+
         return notes
 
     def getNotesByDate(self, date):
-        if self._dateExists(date):
+        if date in self.getDates():
             return os.listdir(os.path.join(self.path, date))
         else:
             return []
 
     def getNotesByTag(self, tag):
-        if self._tagExists(tag):
+        if tag in self.getTags():
             return os.listdir(os.path.join(self.tagPath, tag))
         else:
             return []
 
-    def getPath(self, entry):
-        path = None
-        for date in self.getDates():
-            if entry in self.getNotesByDate(date):
-                path = os.path.join(self.path, date, entry)
-                # Breaks cycle after finding first matching date dir
-                break
-        return path
-
     def getText(self, entry):
-       return ''.join(open(self.getPath(entry)).readlines())
+       return ''.join(open(self._getPath(entry)).readlines())
 
     def getNoteDate(self, entry):
-        return os.path.split(os.path.split(self.getPath(entry))[0])[1]
+        return os.path.split(os.path.split(self._getPath(entry))[0])[1]
 
     def getNoteTags(self, entry):
         return [tag for tag in self.getTags() if entry in self.getNotesByTag(tag)]
@@ -127,33 +119,36 @@ class FileSystem(object):
         return (entry in self.getNotes())
 
     def createDate(self, date):
-        if not self._dateExists(date):
+        if not date in self.getDates():
             os.mkdir(os.path.join(self.path, date))
 
     def createTag(self, tag):
-        if not self._tagExists(tag):
+        if not tag in self.getTags():
             os.mkdir(os.path.join(self.tagPath, tag))
 
     def removeDate(self, date):
-        if self._dateExists(date) and len(self.getNotesByDate(date)) == 0:
+        if date in self.getDates() and len(self.getNotesByDate(date)) == 0:
             os.rmdir(os.path.join(self.path, date))
 
     def removeTag(self, tag):
-        if self._tagExists(tag):
+        if tag in self.getTags():
+
             for i in self.getNotesByTag(tag):
                 os.remove(os.path.join(self.tagPath, tag, i))
+
             os.rmdir(os.path.join(self.tagPath, tag))
 
     def deleteNote(self, entry):
         if self.noteExists(entry):
             date = self.getNoteDate(entry)
+
             for tag in self.getNoteTags(entry):
                 os.remove(os.path.join(self.tagPath, tag, entry))
-                # Removing tag if it has not any note
+
                 if len(self.getNotesByTag(tag)) == 0:
                     self.removeTag(tag)
 
-            os.remove(self.getPath(entry))
+            os.remove(self._getPath(entry))
             self.removeDate(date)
 
     def write(self, entry, text):
@@ -161,20 +156,24 @@ class FileSystem(object):
             date = self._today()
             self.createDate(date)
             open(os.path.join(self.path, date, entry), 'w').write(text)
+
         else:
-            open(self.getPath(entry), 'w').write(text)
+            open(self._getPath(entry), 'w').write(text)
 
     def tag(self, entry, tags):
         src = self.getNoteTags(entry)
+
         for tag in tags:
             if tag not in src:
                 self.createTag(tag)
+
                 try:
                     os.symlink(os.path.join('../../date', self.getNoteDate(entry), entry),
                         os.path.join(self.tagPath, tag, entry))
+    
                 except AttributeError:
-                    # Hack for filesystems without symbolic links support
                     open(os.path.join(self.tagPath, tag, entry), 'w')
+
         for tag in src:
             if tag not in tags:
                 os.remove(os.path.join(self.tagPath, tag, entry))

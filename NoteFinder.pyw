@@ -814,8 +814,8 @@ class Application(Qt.QObject):
                 widget.ui.nameEdit.setEnabled(False)
                 widget.refresh()
 
-                if self.settings['Bool']['Session']:
-                    if not entry in self.settings['List']['Session']:
+                if self.settings['Bool']['Sessions']:
+                    if not widget.note.name in self.settings['List']['Session']:
                         self.settings['List']['Session'].append(widget.note.name)
 
                         self.saveSession()
