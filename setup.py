@@ -54,6 +54,7 @@ setup(
                 'clipboard_capture = notefinderlib.plugins.clipboard_capture:ClipboardCapture',
                 'web_notebook = notefinderlib.plugins.web_notebook:WebNotebook',
                 'note_of_the_day=notefinderlib.plugins.note_of_the_day:NoteOfTheDay',
-                'remove_empty = notefinderlib.plugins.remove_empty:RemoveEmpty'
+                'remove_empty = notefinderlib.plugins.remove_empty:RemoveEmpty',
+		'remind = notefinderlib.plugins.remind:Remind',
             ],
         })
