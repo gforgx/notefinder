@@ -98,7 +98,7 @@ class WebNotebook(plugin.Plugin):
         open(os.path.join(path, "index.html"), 'w').write(index)
         
         # Creating notes
-        for note in self.app.notebook.getNotes():
+        for note in self.app.notebook.notes():
             n = Note(note, self.app.notebook)
             html = "<html>\n<head>\n<title>%s</title>\n\
                 <link rel='stylesheet' type='text/css' href='../style.css'>\n\

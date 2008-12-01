@@ -343,7 +343,7 @@ class Application(Qt.QObject):
             config.addNotebook('Default', 'FileSystem', 'Wiki', [os.path.expanduser('~/.notes')])
             self.setNotebook('Default')
 
-        self.parameter = [self.notebook.getNotes]
+        self.parameter = [self.notebook.notes]
 
         self.loadPlugins()
 
@@ -562,7 +562,7 @@ class Application(Qt.QObject):
 
         if self.settings['Bool']['Sessions']:
             try:
-                self.settings['List']['Session'].remove(self.mainWindow.ui.tabWidget.currentWidget().note.name)
+                self.settings['List']['Session'].remove(self.mainWindow.ui.tabWidget.currentWidget().note)
                 self.saveSession()
             except:
                 pass
@@ -586,6 +586,7 @@ class Application(Qt.QObject):
         self.copyDialog.ui.notebooks.clear()
 
         notebooks = config.getNotebooks()
+        notebooks.sort()
 
         if not len(notebooks) == 1:
             for i in notebooks:
@@ -603,21 +604,24 @@ class Application(Qt.QObject):
                 
                 if i == self.notebook.name:
                     item.setFont(self.boldFont)
-        
+
+        dates = self.notebook.dates()
+        dates.sort()
+
         if self.settings['Bool']['Dates']:
-            dates = self.notebook.getDates()
-            dates.sort()
             for i in dates:
                 item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/date.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
                 item.type = 'date'
 
-        if self.notebook.backend.Tag:
-            for i in self.notebook.getTags():
-                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+        tags = self.notebook.tags()
+        tags.sort()
 
-                notes = self.notebook.getNotesByTag(i)
-                item.setToolTip(unicode('Notes (%i): %s' % (len(notes), ', '.join(notes)), 'utf'))
-                item.type = 'tag'
+        for i in tags:
+            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+
+            notes = self.notebook.byTag(i)
+            item.setToolTip(unicode('Notes (%i): %s' % (len(notes), ', '.join(notes)), 'utf'))
+            item.type = 'tag'
 
         for i in self.searches:
             item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
@@ -628,23 +632,23 @@ class Application(Qt.QObject):
 
         # Adding search completer items
         if self.settings['Bool']['SearchCompletion']:
-            self.completer = Qt.QCompleter(['tag:' + unicode(i, 'utf') for i in self.notebook.getTags()] \
-            + ['date:' + unicode(i, 'utf') for i in self.notebook.getDates()])
+            self.completer = Qt.QCompleter(['tag:' + unicode(i, 'utf') for i in tags] \
+            + ['date:' + unicode(i, 'utf') for i in dates])
             self.mainWindow.ui.searchEdit.setCompleter(self.completer)
 
         # Refreshing summary
         status = unicode('Today is %s  Tags: %i  Notes: %i' % \
-        ('%d-%d-%d' % localtime()[:3],  self.notebook.getTagsNumber(), self.notebook.getNotesNumber()), 'utf')
+        ('%d-%d-%d' % localtime()[:3],  len(tags), len(self.notebook.notes())), 'utf')
         self.mainWindow.ui.statusbar.showMessage(status)
         self.tray.setToolTip(status)
 
     def openMeta(self, item):
         if item.type == 'tag':
-            self.parameter = [self.notebook.getNotesByTag, str(item.text().toUtf8())]
+            self.parameter = [self.notebook.byTag, str(item.text().toUtf8())]
             self.display(self.parameter)
             desc = self.parameter[1]
         elif item.type == 'date':
-            self.parameter = [self.notebook.getNotesByDate, str(item.text().toUtf8())]
+            self.parameter = [self.notebook.byDate, str(item.text().toUtf8())]
             self.display(self.parameter)
             desc = self.parameter[1]
         elif item.type == 'search':
@@ -655,9 +659,8 @@ class Application(Qt.QObject):
             name = str(item.text().toUtf8())
             try:
                 self.setNotebook(name)
-                self.parameter = [self.notebook.getNotes]
+                self.parameter = [self.notebook.notes]
                 self.refresh()
-                self.emit(Qt.SIGNAL('notebookChanged()'))
                 desc = 'All'
             except Exception, err:
                 self.showMessage(str(err))
@@ -666,28 +669,27 @@ class Application(Qt.QObject):
     
     def openDate(self):
         date = self.mainWindow.ui.dateEdit.date()
-        self.parameter = [self.notebook.getNotesByDate, \
-        str(date.year()) + '-' + str(date.month()) + '-' + str(date.day())]
+        self.parameter = [self.notebook.byDate, str(date.year()) + '-' + str(date.month()) + '-' + str(date.day())]
         self.display(self.parameter)
     
     def today(self):
-        self.parameter = [self.notebook.getNotesByDate, '%d-%d-%d' % localtime()[:3]]
+        self.parameter = [self.notebook.byDate, '%d-%d-%d' % localtime()[:3]]
         self.display(self.parameter)
     
     def findRelated(self):
         if len(self.selectedNotes()) == 1:
-            self.parameter = [Note(self.currentNote(), self.notebook).findRelated]
+            self.parameter = [self.notebook.related, self.currentNote()]
             self.display(self.parameter)
     
     def backlinks(self):
         if len(self.selectedNotes()) == 1:
-            self.parameter = [Note(self.currentNote(), self.notebook).getBacklinks]
+            self.parameter = [self.backlinks, self.currentNote()]
             self.display(self.parameter)
     
     def search(self, text = None):
         if text is None:
             text = self.mainWindow.ui.searchEdit.text()
-        self.parameter = [self.notebook.search, str(text.toUtf8()).split(" ")]
+        self.parameter = [self.notebook.search, str(text.toUtf8()).split(' ')]
         self.display(self.parameter)
 
     def refreshMenu(self):
@@ -706,18 +708,17 @@ class Application(Qt.QObject):
         
         for i in entries:
             try:
-                note = Note(i, self.notebook)
                 item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.notesList)
                 
                 if self.settings['Bool']['Tooltips']:
-                    text = note.getText()
+                    text = self.notebook.get(i)
                     if self.notebook.markup == 'Wiki': 
                         html = text2html(unicode(text, 'utf'))
                     else: 
                         html = text
 
                     item.setToolTip(unicode('Title: %s<br>Date: %s<br>Tags: %s<br>Text: %s<br>Length: %i characters' \
-                    % (i, note.getDate(), ', '.join(note.getTags()), html, note.getLength()), 'utf'))
+                    % (i, note.getDate(), ', '.join(note.getTags()), html, len(text)), 'utf'))
             except:
                 pass
     
@@ -734,9 +735,8 @@ class Application(Qt.QObject):
         for i in (tab.ui.tagEdit,tab.ui.tagsList, tab.ui.addTagButton,tab.ui.delTagButton, tab.ui.autoTagButton):
             i.setHidden(not self.notebook.backend.Tag)
 
-        if self.notebook.backend.Tag:
-            if self.parameter[0] == self.notebook.getNotesByTag:
-                tab.addTag(self.parameter[1])
+        if self.parameter[0] == self.notebook.byTag:
+            tab.addTag(self.parameter[1])
     
         tab.ui.nameEdit.setText(unicode(name, 'utf'))
         tab.ui.date.setText('%d-%d-%d' % localtime()[:3])
@@ -761,21 +761,17 @@ class Application(Qt.QObject):
         tab.ui.nameEdit.setText(unicode(entry, 'utf'))
     
         # Creating Note instance
-        note = Note(entry, self.notebook)
-        tab.note = note
-        tab.ui.date.setText(self.trUtf8(note.getDate()))
-        text = note.getText()
-        tab.ui.textEdit.setPlainText(unicode(note.getText(), 'utf'))
+        tab.note = entry
+        tab.ui.date.setText(self.trUtf8(self.notebook.noteDate(entry)))
+        tab.ui.textEdit.setPlainText(unicode(self.notebook.get(entry), 'utf'))
     
         # Displaying tags
         for i in (tab.ui.tagEdit, tab.ui.tagsList, tab.ui.addTagButton, tab.ui.delTagButton, tab.ui.autoTagButton):
-            i.setHidden(not note.notebook.backend.Tag)
+            i.setHidden(not self.notebook.backend.Tag)
     
-        if note.notebook.backend.Tag:
-            for tag in note.getTags():
-                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(tag, 'utf'), tab.ui.tagsList)
-                notes = self.notebook.getNotesByTag(tag)
-                item.setToolTip(self.trUtf8('Tag: %s<br>Notes (%i): %s' % (tag, len(notes), ', '.join(notes))))
+        if self.notebook.backend.Tag:
+            for tag in self.notebook.noteTags(entry):
+                tab.addTag(tag)
 
         self.mainWindow.ui.tabWidget.addTab(tab, "")
         self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
@@ -787,7 +783,6 @@ class Application(Qt.QObject):
                 self.settings['List']['Session'].append(entry)
 
                 self.saveSession()
-
 
         # If search was performed:
         if self.parameter[0] == self.notebook.search:
@@ -804,38 +799,36 @@ class Application(Qt.QObject):
             tags = widget.tags()
 
             if not hasattr(widget, 'note'):
-                widget.note = Note(str(widget.ui.nameEdit.text().toUtf8()), self.notebook)
-                self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(widget), unicode(widget.note.name, 'utf'))
+                widget.note = str(widget.ui.nameEdit.text().toUtf8())
+                self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(widget), unicode(widget.note, 'utf'))
 
             try:
-                widget.note.write(text)
-                widget.note.tag(tags)
+                self.notebook.add(widget.note, text)
+                self.notebook.tag(widget.note, tags)
                 self.emit(Qt.SIGNAL('notesModified()'))
                 widget.ui.nameEdit.setEnabled(False)
                 widget.refresh()
 
                 if self.settings['Bool']['Sessions']:
-                    if not widget.note.name in self.settings['List']['Session']:
-                        self.settings['List']['Session'].append(widget.note.name)
+                    if not widget.note in self.settings['List']['Session']:
+                        self.settings['List']['Session'].append(widget.note)
 
                         self.saveSession()
-
-            except:
-                self.showMessage('Failed to save entry')
+            
+            except Exception, err:
+                self.showMessage("Can't save entry:\n<b>%s</b>" % (str(err)))
 
     def buildListIndex(self):
         self.new(text='\n'.join(["* [[" + i + "]]" for i in self.selectedNotes()]))
     
     def merge(self):
-        self.new(text='\n----\n'.join(["[[" + note + "]]\n\n" + Note(note, self.notebook).getText() for note in self.selectedNotes()]))
+        self.new(text='\n----\n'.join(["[[" + note + "]]\n\n" + self.notebook.get(note) for note in self.selectedNotes()]))
     
     def currentNote(self):
-        note = None
         index = self.mainWindow.ui.notesList.currentRow()
         item = self.mainWindow.ui.notesList.item(index)
         if not item is None:
-            note = str(item.text().toUtf8())
-        return note
+            return str(item.text().toUtf8())
     
     def openFromList(self):
         self.openNote(self.currentNote())
@@ -847,38 +840,35 @@ class Application(Qt.QObject):
         if len(self.selectedNotes()) == 1:
             name = self.currentNote()
             if not name is None:
-                note = Note(name, self.notebook)
-                Qt.QDesktopServices.openUrl(Qt.QUrl(unicode('mailto:?subject=%s&body=%s' % (note.name, note.getText()), 'utf')))
+                Qt.QDesktopServices.openUrl(Qt.QUrl(unicode('mailto:?subject=%s&body=%s' % (name, self.notebook.get(name)), 'utf')))
 
     def openExternally(self):
         if len(self.selectedNotes()) == 1:
             name = self.currentNote()
             if not name is None:
-                Qt.QDesktopServices().openUrl(Qt.QUrl(unicode(Note(name, self.notebook).getURL(), 'utf')))
+                Qt.QDesktopServices().openUrl(Qt.QUrl(unicode(self.notebook.url(name), 'utf')))
     
     def deleteNotes(self):
         for note in self.selectedNotes():
-            Note(note, self.notebook).delete()
+            self.notebook.delete(note)
         self.emit(Qt.SIGNAL('notesModified()'))
    
     def renameNote(self):
         if len(self.selectedNotes()) == 1:
             name = str(self.renameDialog.ui.lineEdit.text().toUtf8())
             if name != '' and not name in self.notebook.getNotes():
-                    Note(self.currentNote(), self.notebook).rename(name)
+                    self.notebook.rename(self.currentNote(), name)
                     self.emit(Qt.SIGNAL('notesModified()'))
         else:
             self.showMessage('Only 1 note can be renamed at a time')
 
     def copyEntry(self):
+        move = self.copyDialog.ui.deleteBox.isChecked()
         for note in self.selectedNotes():
-            Note(note, self.notebook).copyToNotebook(\
-            [str(item.text().toUtf8()) for item in self.copyDialog.ui.notebooks.selectedItems()],\
-            move=self.copyDialog.ui.deleteBox.isChecked())
+            self.notebook.copy(note, [str(i.text().toUtf8()) for i in self.copyDialog.ui.notebooks.selectedItems()], move)
         self.emit(Qt.SIGNAL('notesModified()'))
 
     def addNotebook(self):
-        """ Adds notebook """
         config.addNotebook(
             str(self.notebookDialog.ui.nameEdit.text().toUtf8()),
             str(self.notebookDialog.ui.backends.currentText().toUtf8()),
@@ -914,7 +904,7 @@ class Application(Qt.QObject):
         self.emit(Qt.SIGNAL('notesModified()'))
     
     def showAll(self):
-        self.parameter = [self.notebook.getNotes]
+        self.parameter = [self.notebook.notes]
         self.display(self.parameter)
     
     def saveSearch(self):

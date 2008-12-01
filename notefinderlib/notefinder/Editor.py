@@ -66,7 +66,7 @@ class EditorWidget(Qt.QWidget):
     def refresh(self):
         self.ui.tagEdit.clear()
 
-        for tag in self.app.notebook.getTags():
+        for tag in self.app.notebook.tags():
             self.ui.tagEdit.addItem(unicode(tag, 'utf'))
 
         self.ui.tagEdit.setEditText('')
@@ -76,7 +76,7 @@ class EditorWidget(Qt.QWidget):
             line = str(self.ui.tagEdit.currentText().toUtf8())
 
         if not line == '' and not line in self.tags():
-            notes = self.app.notebook.getNotesByTag(line)
+            notes = self.app.notebook.byTag(line)
 
             item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.app.settings['String']['Icons'])), unicode(line, 'utf'), self.ui.tagsList)
             item.setToolTip(self.trUtf8('Notes (%i): %s' % (len(notes), ', '.join(notes))))

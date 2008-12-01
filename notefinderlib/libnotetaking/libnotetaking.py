@@ -32,90 +32,10 @@
 # Standard library imports
 import os
 import re
-import ConfigParser
 
-# Backend imports
-from notefinderlib.libnotetaking.backends.dokuwiki import DokuWiki
-from notefinderlib.libnotetaking.backends.files import Files
-from notefinderlib.libnotetaking.backends.filesystem import FileSystem
-from notefinderlib.libnotetaking.backends.ical import iCal
-from notefinderlib.libnotetaking.backends.ipod import iPod
-from notefinderlib.libnotetaking.backends.mail import Mail
-from notefinderlib.libnotetaking.backends.rss import RSS
-from notefinderlib.libnotetaking.backends.wixi import Wixi
-from notefinderlib.libnotetaking.backends.zim import Zim
+from backend import *
+from config import *
 
-# Backends dictionary
-backends = {
-    'FileSystem':FileSystem,
-    'Files':Files,
-    'iCal':iCal,
-    'iPod':iPod,
-    'DokuWiki':DokuWiki,
-    'RSS':RSS,
-    'Mail':Mail,
-    'Zim':Zim,
-    'Wixi':Wixi
-    }
-
-class Config(ConfigParser.ConfigParser):
-    def __init__(self):
-        ConfigParser.ConfigParser.__init__(self)
-        
-        # Makes option names case-sensitive
-        self.optionxform = str
-        
-        self.file = os.path.expanduser('~/.config/notefinder/notefinder.ini')
-        confDir = os.path.expanduser('~/.config')
-        if not os.path.exists(confDir):
-            os.mkdir(confDir)
-        if not os.path.exists(os.path.join(confDir, 'notefinder')):
-            os.mkdir(os.path.join(confDir, 'notefinder'))
-        if os.path.exists(self.file):
-            self.read(self.file)
-    
-    def addNotebook(self, name, backend, markup, settings):
-        if not self.has_section('Notebooks'):
-            self.add_section('Notebooks')
-        self.set('Notebooks', name, backend)
-
-        if not self.has_section(backend):
-            self.add_section(backend)
-        self.set(backend, name, ';'.join(settings))
-
-        if not self.has_section('Markup'):
-            self.add_section('Markup')
-        self.set('Markup', name, markup)
-
-        self.write(open(self.file, 'w'))
-        
-    def deleteNotebook(self, name):
-        self.remove_option('Notebooks', name)
-        self.remove_option(self.getBackend(name), name)
-        self.remove_option('Markup', name)
-
-        self.write(open(self.file, 'w'))
-    
-    def setDefault(self, name):
-        if not self.has_section('General'):
-            self.add_section('General')
-        self.set('General', 'Notebook', name)
-
-        self.write(open(self.file, 'w'))
-
-    def getNotebook(self):
-        if self.has_option('General', 'Notebook'):
-            return self.get('General', 'Notebook')
-
-    def getNotebooks(self):
-        if self.has_section('Notebooks'):
-            return self.options('Notebooks')
-
-    def getBackend(self, name):
-        if self.has_option('Notebooks', name):
-            return self.get('Notebooks', name)
- 
-# Initializing configuration parser
 config = Config()
 
 class Notebook(object):
@@ -132,31 +52,72 @@ class Notebook(object):
 
         self.Wiki = (self.markup == 'Wiki')
 
-    def getNotes(self):
+    def add(self, note, text):
+        self.backend.write(note, text)
+
+    def tag(self, note, tags):
+        self.backend.tag(note, tags)
+
+    def delete(self, note):
+        return self.backend.deleteNote(note)
+
+    def rename(self, note, new):
+        self.add(new, self.get(note))
+        self.tag(new, self.noteTags(note))
+        self.delete(note)
+
+    def copy(self, note, notebooks, move=False):
+        for i in notebooks:
+            Notebook(i).add(self.get(note))
+
+        if move:
+            self.delete(note)
+
+    def get(self, note):
+        return self.backend.getText(note)
+
+    def noteDate(self, note):
+        return self.backend.getNoteDate(note)
+
+    def noteTags(self, note):
+        return self.backend.getNoteTags(note)
+
+    def url(self, note):
+        return self.notebook.backend.getURL(note)
+
+    def backlinks(self, note):
+        return [i for i in self.notes() if re.compile(r'^.*\[\[%s(\|.*)?\]\].*$' % (note), re.DOTALL).match(self.get(i))]
+
+    def related(self, note):
+        notes = []
+
+        for tag in self.noteTags(note):
+            for note in self.byTag(tag):
+                if not note in notes:
+                    notes.append(note)
+
+        return notes
+
+    def notes(self):
         return self.backend.getNotes()
 
-    def getNotesNumber(self):
-        return len(self.getNotes())
-
-    def getDates(self):
+    def dates(self):
         return self.backend.getDates()
 
-    def getTags(self):
-        tags = self.backend.getTags()
-        tags.sort()
-        return tags
+    def tags(self):
+        return self.backend.getTags()
 
-    def getTagsNumber(self):
-        return len(self.getTags())
+    def has(self, note):
+        return self.backend.noteExists(note)
 
-    def getNotesByDate(self, date):
+    def byDate(self, date):
         return self.backend.getNotesByDate(date)
     
-    def getNotesByTag(self, tag):
+    def byTag(self, tag):
         return self.backend.getNotesByTag(tag)
     
-    def getNotesByText(self, text):
-        return [note for note in self.getNotes() if Note(note, self).matches(text)]
+    def byText(self, t):
+        return [i for i in self.notes() if re.compile('^.*%s.*$' % (self.get(i)), re.DOTALL, re.IGNORECASE).match(t)]
 
     def search(self, items):
         results = []
@@ -209,80 +170,12 @@ class Notebook(object):
 
             results.append(notes)
     
-        intersection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).intersection(intersection(list[1::]))
+        isection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).isection(isection(list[1::]))
 
-        return list(intersection(results))
+        return list(isection(results))
     
     def addTag(self, tag):
         self.backend.createTag(tag)
     
     def deleteTag(self, tag):
         self.backend.removeTag(tag)
-
-    def error(self, text):
-        raise NotebookError(text)
-
-class Note(object):
-    """ Note class """
-    def __init__(self, name, notebook):
-        self.name = name
-        
-        # Entry notebook, used for backend interaction
-        self.notebook = notebook
-
-    def exists(self):
-        return self.notebook.backend.noteExists(self.name)
-
-    def getDate(self):
-        return self.notebook.backend.getNoteDate(self.name)
-
-    def getTags(self):
-        return self.notebook.backend.getNoteTags(self.name)
-
-    def getText(self):
-        return self.notebook.backend.getText(self.name)
-    
-    def matches(self, expression):
-        return (expression in self.getText())
-
-    def getBacklinks(self):
-        return [note for note in self.notebook.getNotes() \
-                if re.compile(r'^.*\[\[%s(\|.*)?\]\].*$' % (self.name), re.DOTALL).match(Note(note, self.notebook).getText())]
-
-    def getURL(self):
-        return self.notebook.backend.getURL(self.name)
-
-    def findRelated(self):
-        notes = []
-        for tag in self.getTags():
-            for note in self.notebook.getNotesByTag(tag):
-                if not note in notes:
-                    notes.append(note)
-        return notes
-
-    def getLength(self):
-        return len(self.getText())
-
-    def write(self, text):
-        self.notebook.backend.write(self.name, text)
-
-    def tag(self, tags):
-        self.notebook.backend.tag(self.name, tags)
-
-    def copyToNotebook(self, notebooks, move=False):
-        for nb in notebooks:
-            Note(self.name, Notebook(nb)).write(self.getText())
-        if move:
-            self.delete()
-         
-    def import_(self, file):
-        self.write(open(file).read())
-
-    def delete(self):
-        self.notebook.backend.deleteNote(self.name)
-
-    def rename(self, name):
-        note = Note(name, self.notebook)
-        note.write(self.getText())
-        note.tag(self.getTags())
-        self.delete()
