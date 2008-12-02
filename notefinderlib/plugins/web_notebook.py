@@ -99,19 +99,18 @@ class WebNotebook(plugin.Plugin):
         
         # Creating notes
         for note in self.app.notebook.notes():
-            n = Note(note, self.app.notebook)
+            date = self.app.notebook.noteDate(note)
             html = "<html>\n<head>\n<title>%s</title>\n\
                 <link rel='stylesheet' type='text/css' href='../style.css'>\n\
                 <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n\
                 </head>\n\
-                <body>\nDate: <a href = '../dates/%s.html'>%s</a>\n<br>\nTags: " % (note, n.getDate(),
-                    n.getDate())
-            for tag in n.getTags():
+                <body>\nDate: <a href = '../dates/%s.html'>%s</a>\n<br>\nTags: " % (note, date, date)
+            for tag in self.app.notebook.noteTags(note):
                 html += "<a href = '../tags/%s.html'>%s</a> " % (tag, tag)
             if self.app.notebook.markup == 'Wiki':
-                htmlcode = text2html(unicode(n.getText(), "utf"))
+                htmlcode = text2html(unicode(self.app.notebook.get(note), "utf"))
             else:
-                htmlcode = n.getText()
+                htmlcode = self.app.notebook.get(note)
             html += "<br>\n %s</body>\n</html>" % (htmlcode)
             open(os.path.join(path, "notes", note+".html"), 'w').write(html)
         
@@ -121,14 +120,14 @@ class WebNotebook(plugin.Plugin):
             <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n\
             </head>\n\
             <body>\n<ul>\n"
-        for date in self.app.notebook.getDates():
+        for date in self.app.notebook.dates():
             dateIndex += "<li><a href = dates/%s.html>%s</a></li>\n" % (date, date)
             html = "<html>\n<head>\n<title>%s</title>\n\
                 <link rel='stylesheet' type='text/css' href='../style.css'>\n\
                 <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n\
                 </head>\n\
                 <body>\n<ul>\n" % (date)
-            for note in self.app.notebook.getNotesByDate(date):
+            for note in self.app.notebook.byDate(date):
                 html += "<li><a href = '../notes/%s.html'>%s</a></li>\n" % (note, note)
             html += "</ul>\n</body>\n</html>"
             open(os.path.join(path, "dates", date+".html"), 'w').write(html)
@@ -141,14 +140,14 @@ class WebNotebook(plugin.Plugin):
             <link rel='stylesheet' type='text/css' href='style.css'>\n\
             </head>\n\
             <body>\n<ul>\n"
-        for tag in self.app.notebook.getTags():
+        for tag in self.app.notebook.tags():
             tagIndex += "<li><a href = 'tags/%s.html'>%s</a></li>\n" % (tag, tag)
             html = "<html>\n<head>\n<title>%s</title>\n\
                 <link rel='stylesheet' type='text/css' href='../style.css'>\n\
                 <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n\
                 </head>\n\
                 <body>\n<ul>\n" % (tag)
-            for note in self.app.notebook.getNotesByTag(tag):
+            for note in self.app.notebook.byTag(tag):
                 html += "<li><a href = '../notes/%s.html'>%s</a></li>\n" % (note, note)
             html += "</ul></body></html>"
             open(os.path.join(path, "tags", tag+".html"), 'w').write(html)
@@ -162,7 +161,7 @@ class WebNotebook(plugin.Plugin):
             <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />\n\
             </head>\n\
             <body>\n<ul>\n"
-        for note in self.app.notebook.getNotes():
+        for note in self.app.notebook.notes():
             all += "<li><a href = 'notes/%s.html'>%s</a></li>\n" % (note, note)
         all += "</ul>\n</body>\n</html>"
         open(os.path.join(path, "all.html"), 'w').write(all)

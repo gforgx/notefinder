@@ -38,20 +38,20 @@ from notefinderlib.notefinder import plugin, notefinder_rc
 
 class NoteOfTheDay(plugin.Plugin):
     
-    name = "NoteOfTheDay"
+    name = 'NoteOfTheDay'
     
     def __init__(self, parent):
         plugin.Plugin.__init__(self, parent)
-        self.setText("Note of the day")
-        self.setToolTip("Open note of the day")
+        self.setText('Note of the day')
+        self.setToolTip('Open note of the day')
         self.setIcon(Qt.QIcon(':/icons/%s/date.png' % (self.app.settings['String']['Icons'])))
         self.addToTray()
         
     def onLoad(self):
-        note = Note('%d-%d-%d' % localtime()[:3], self.app.notebook)
-        if not note.exists():
-            note.write("**Notes and thoughts for %s**\n----" % ('%d-%d-%d' % localtime()[:3]))
-            self.emit(Qt.SIGNAL("done()"))
+        note = '%d-%d-%d' % localtime()[:3]
+        if not self.app.notebook.has(note):
+            self.app.notebook.add(note, '**Notes and thoughts for %s**\n----' % ('%d-%d-%d' % localtime()[:3]))
+            self.emit(Qt.SIGNAL('done()'))
     
     def do(self):
         self.onLoad()

@@ -38,18 +38,17 @@ from notefinderlib.notefinder import plugin, notefinder_rc
 
 class RemoveEmpty(plugin.Plugin):
     
-    name = "RemoveEmpty"
+    name = 'RemoveEmpty'
     
     def __init__(self, parent):
         plugin.Plugin.__init__(self, parent)
-        self.setText("Remove empty entries")
-        self.setToolTip("Remove all empty entries")
+        self.setText('Remove empty notes')
+        self.setToolTip('Remove all empty notes')
         self.setIcon(Qt.QIcon(':/icons/%s/clear.png' % (self.app.settings['String']['Icons'])))
     
     def do(self):
-        for note in self.app.notebook.getNotes():
-            obj = Note(note, self.app.notebook)
-            if obj.getLength() == 0:
-                obj.delete()
-        self.emit(Qt.SIGNAL("done()"))
+        for note in self.app.notebook.notes():
+            if len(self.app.notebook.get(note)) == 0:
+                self.app.notebook.delete(note)
+        self.emit(Qt.SIGNAL('done()'))
             

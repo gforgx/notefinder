@@ -36,12 +36,12 @@ from notefinderlib.libnotetaking import *
 
 class ClipboardCapture(plugin.Plugin):
     
-    name = "ClipboardCapture"
+    name = 'ClipboardCapture'
     
     def __init__(self, parent):
         plugin.Plugin.__init__(self, parent)
-        self.setText("Capture clipboard")
-        self.setToolTip("Capture clipboard")
+        self.setText('Capture clipboard')
+        self.setToolTip('Capture clipboard')
         self.setIcon(Qt.QIcon(':/icons/%s/paste.png' % (self.app.settings['String']['Icons'])))
         self.addToTray()
         
@@ -49,6 +49,5 @@ class ClipboardCapture(plugin.Plugin):
         cb = Qt.QApplication.clipboard()
         text = str(cb.text().toUtf8())
         name = 'New note %s' % (datetime.strftime(datetime.today(),'%Y-%m-%d %H-%M-%S'))
-        note = Note(name, self.app.notebook)
-        note.write(text)
-        self.emit(Qt.SIGNAL("done()"))
+        self.app.notebook.add(name, text)
+        self.emit(Qt.SIGNAL('done()'))

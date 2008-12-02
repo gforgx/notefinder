@@ -52,7 +52,7 @@ class Remind(plugin.Plugin):
         self.dialog.setWindowIcon(self.icon())
         self.dialog.setWindowTitle(self.toolTip())
         self.layout = Qt.QVBoxLayout(self.dialog)
-        self.label = Qt.QLabel('Enter reminder date in any human-readable format\nlike "12:30", "11pm", "11:00 next week" or "11:00 tomorrow"')
+        self.label = Qt.QLabel('Enter reminder date in any human-readable format like\n "12:30", "11pm", "11:00 next week" or "11:00 tomorrow"')
         self.timeEdit = Qt.QLineEdit()
         self.buttonBox = Qt.QDialogButtonBox()
         self.buttonBox.setStandardButtons(Qt.QDialogButtonBox.Cancel|Qt.QDialogButtonBox.Ok)
@@ -69,9 +69,9 @@ class Remind(plugin.Plugin):
     def add(self):
         if len(self.app.selectedNotes()) == 1:
             title = self.app.currentNote()
-            text = Note(title, self.app.notebook).getText()
+            text = self.app.notebook.get(title)
             time = str(self.timeEdit.text().toUtf8())
-            os.system('echo "kdialog --title "%s" --msgbox "%s" | at %s"' % (title, text, time))
+            os.system("echo DISPLAY=:0 kdialog --title '%s' --msgbox '%s' | at %s" % (title, text, time))
             self.dialog.close()
         else:
-            self.showMessage('Only one note should be selected')
+            self.showMessage('You should select one entry')
