@@ -66,7 +66,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.3.6'
+__version__ = '0.3.7'
 
 class Application(Qt.QObject):
     def __init__(self):
@@ -122,22 +122,17 @@ class Application(Qt.QObject):
             'Mail': ':/icons/%s/mail.png' % (self.settings['String']['Icons'])
         }
 
-        self.connect(self, Qt.SIGNAL('notesModified()'), self.refresh)
 
         # Main window stuff
         self.mainWindow = Qt.QMainWindow()
         self.mainWindow.ui = Ui_MainWindow()
         self.mainWindow.ui.setupUi(self.mainWindow)
         self.mainWindow.setWindowIcon(Qt.QIcon(':/icons/icon.png'))
-        
-        # Setting current date
-        date = localtime()[:3]
-        self.mainWindow.ui.dateEdit.setDate(Qt.QDate(date[0], date[1], date[2]))
-
+    
         self.mainWindow.ui.closeButton = Qt.QToolButton(self.mainWindow)
-        self.mainWindow.ui.closeButton.setToolButtonStyle(Qt.Qt.ToolButtonIconOnly)
         self.mainWindow.ui.closeButton.setShortcut('Ctrl+W')
         self.mainWindow.ui.tabWidget.setCornerWidget(self.mainWindow.ui.closeButton)
+
         self.mainWindow.closeEvent = self.closeEvent
 
         # Сontext menus
@@ -159,7 +154,7 @@ class Application(Qt.QObject):
 
         self.connect(self.mainWindow.ui.actionAboutQt, Qt.SIGNAL('triggered()'), self.application.aboutQt)
         self.connect(self.mainWindow.ui.metaList, Qt.SIGNAL('itemSelectionChanged()'), self.refreshMenu)
-        self.connect(self.mainWindow.ui.closeButton, Qt.SIGNAL("clicked()"), self.closeTab)
+        self.connect(self.mainWindow.ui.closeButton, Qt.SIGNAL('clicked()'), self.closeTab)
         self.connect(self.mainWindow.ui.actionExit, Qt.SIGNAL('triggered()'), self.application.quit)
         
         self.connect(self.mainWindow.ui.dateEdit, Qt.SIGNAL('editingFinished()'), self.openDate)
@@ -337,13 +332,7 @@ class Application(Qt.QObject):
         self.mainWindow.ui.splitter.setSizes([self.settings['Int']['SplitterLeft'], self.settings['Int']['SplitterRight']])
         
         # Initializing notebook
-        try:
-            self.setNotebook(config.getNotebook(), True)
-        except:
-            config.addNotebook('Default', 'FileSystem', 'Wiki', [os.path.expanduser('~/.notes')])
-            self.setNotebook('Default')
-
-        self.parameter = [self.notebook.notes]
+        self.setNotebook(config.getNotebook(), True)
 
         self.loadPlugins()
 
@@ -541,8 +530,21 @@ class Application(Qt.QObject):
         self.notebookDialog.adjustSize()
 
     def setNotebook(self, notebook, fr=False):
-        self.notebook = Notebook(notebook)
-        config.setDefault(notebook)
+        if not fr:
+            previous = self.notebook.name
+
+        try:
+            self.notebook = Notebook(notebook)
+            config.setDefault(notebook)
+            self.parameter = [self.notebook.notes]
+            self.display(self.parameter)
+        except Exception, err:
+            self.showMessage(str(err))
+            if not fr:
+                self.setNotebook(previous, fr)
+            else:
+                config.addNotebook('Default', 'FileSystem', 'Wiki', [os.path.expanduser('~/.notes')])
+                self.setNotebook('Default', fr)
 
         for i in self.writeActions: i.setVisible(not self.notebook.backend.ReadOnly)
         for i in self.wikiActions: i.setVisible(self.notebook.Wiki)
@@ -604,6 +606,8 @@ class Application(Qt.QObject):
                 
                 if i == self.notebook.name:
                     item.setFont(self.boldFont)
+
+        self.mainWindow.ui.dateEdit.setDate(Qt.QDate.currentDate())
 
         dates = self.notebook.dates()
         dates.sort()
@@ -805,7 +809,7 @@ class Application(Qt.QObject):
             try:
                 self.notebook.add(widget.note, text)
                 self.notebook.tag(widget.note, tags)
-                self.emit(Qt.SIGNAL('notesModified()'))
+                self.refresh()
                 widget.ui.nameEdit.setEnabled(False)
                 widget.refresh()
 
@@ -851,14 +855,14 @@ class Application(Qt.QObject):
     def deleteNotes(self):
         for note in self.selectedNotes():
             self.notebook.delete(note)
-        self.emit(Qt.SIGNAL('notesModified()'))
+        self.refresh()
    
     def renameNote(self):
         if len(self.selectedNotes()) == 1:
             name = str(self.renameDialog.ui.lineEdit.text().toUtf8())
             if name != '' and not name in self.notebook.getNotes():
-                    self.notebook.rename(self.currentNote(), name)
-                    self.emit(Qt.SIGNAL('notesModified()'))
+                self.notebook.rename(self.currentNote(), name)
+                self.refresh()
         else:
             self.showMessage('Only 1 note can be renamed at a time')
 
@@ -866,7 +870,7 @@ class Application(Qt.QObject):
         move = self.copyDialog.ui.deleteBox.isChecked()
         for note in self.selectedNotes():
             self.notebook.copy(note, [str(i.text().toUtf8()) for i in self.copyDialog.ui.notebooks.selectedItems()], move)
-        self.emit(Qt.SIGNAL('notesModified()'))
+        self.refresh()
 
     def addNotebook(self):
         config.addNotebook(
@@ -883,13 +887,13 @@ class Application(Qt.QObject):
                 if self.notebookDialog.settings[i]
              ]
         )
-        self.emit(Qt.SIGNAL('notesModified()'))
+        self.refresh()
     
     def deleteNotebook(self):
         notebook = str(self.mainWindow.ui.metaList.currentItem().text().toUtf8())
         if not notebook == self.notebook.name:
             config.deleteNotebook(notebook)
-            self.emit(Qt.SIGNAL('notesModified()'))
+            self.refresh()
         else:
             self.showMessage('This notebook is active now')
 
@@ -897,11 +901,11 @@ class Application(Qt.QObject):
         tag = str(self.addTagDialog.ui.lineEdit.text().toUtf8())
         if tag != '' and not tag in self.notebook.getTags():
             self.notebook.addTag(tag)
-            self.emit(Qt.SIGNAL('notesModified()'))
+            self.refresh()
     
     def deleteTag(self):
         self.notebook.deleteTag(str(self.mainWindow.ui.metaList.currentItem().text().toUtf8()))
-        self.emit(Qt.SIGNAL('notesModified()'))
+        self.refresh()
     
     def showAll(self):
         self.parameter = [self.notebook.notes]
@@ -912,14 +916,14 @@ class Application(Qt.QObject):
         if searchText != '' and not searchText in self.searches:
             self.searches.append(searchText)
             pickle.dump(self.searches, open(self.searchesFile, 'w'))
-            self.emit(Qt.SIGNAL('notesModified()'))
+            self.refresh()
 
     def deleteSearch(self):
         item = self.mainWindow.ui.metaList.currentItem()
         if not item is None and item.type == 'search':
             self.searches.remove(str(item.text().toUtf8()))
             pickle.dump(self.searches, open(self.searchesFile, 'w'))
-            self.emit(Qt.SIGNAL('notesModified()'))
+            self.refresh()
 
     def currentWidget(self):
         return self.mainWindow.ui.tabWidget.currentWidget()
