@@ -49,22 +49,22 @@ def help(x):
 
 def list(x):
     """ List all notes in notebook """
-    print '\n'.join(notebook.getNotes())
+    print '\n'.join(notebook.notes())
 
 def note(entry):
     """ Output entry text to console """
-    if Note(entry, notebook).exists():
-        print Note(entry, notebook).getText()
+    if notebook.has(entry):
+        print notebook.get(entry)
 
 def add(entry):
     """ Add entry with given title to the notebook """
-    Note(entry, notebook).write(raw_input())
+    notebook.add(entry, raw_input())
 
 def delete(entry):
     """ Delete entry from the notebook """
     if raw_input('Are you sure? [Y/n]\n') in ('Y', 'y'):
-        if Note(entry, notebook).exists():
-            Note(entry, notebook).delete()
+        if notebook.has(entry):
+            notebook.delete(entry)
 
 def set_notebook(book):
     """ Sets current notebook """
