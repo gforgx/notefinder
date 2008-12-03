@@ -117,7 +117,7 @@ class Notebook(object):
         return self.backend.getNotesByTag(tag)
     
     def byText(self, t):
-        return [i for i in self.notes() if re.compile('^.*%s.*$' % (self.get(i)), re.DOTALL, re.IGNORECASE).match(t)]
+        return [i for i in self.notes() if re.compile('^.*%s.*$' % (t), re.DOTALL|re.IGNORECASE).match(self.get(i))]
 
     def search(self, items):
         results = []
@@ -130,47 +130,47 @@ class Notebook(object):
                 parameter, keyword = item.split(':')
 
                 # Checking date
-                if parameter == 'date': notes = self.getNotesByDate(keyword)
+                if parameter == 'date': notes = self.byDate(keyword)
 
                 # Checking year
                 elif parameter == 'year':
                     notes = []
-                    for date in self.getDates():
-                        if date.split('-')[0] == keyword: notes.extend(self.getNotesByDate(date))
+                    for date in self.dates():
+                        if date.split('-')[0] == keyword: notes.extend(self.byDate(date))
 
                 # Checking month
                 elif parameter == 'month':
                     notes = []
-                    for date in self.getDates():
-                        if date.split('-')[1] == keyword: notes.extend(self.getNotesByDate(date))
+                    for date in self.dates():
+                        if date.split('-')[1] == keyword: notes.extend(self.byDate(date))
 
                 # Checking day
                 elif parameter == 'day':
                     notes = []
-                    for date in self.getDates():
-                        if date.split('-')[2] == keyword:  notes.extend(self.getNotesByDate(date))
+                    for date in self.dates():
+                        if date.split('-')[2] == keyword:  notes.extend(self.byDate(date))
 
                 # Checking tag
-                elif parameter == 'tag': notes = self.getNotesByTag(keyword)
+                elif parameter == 'tag': notes = self.byTag(keyword)
 
                 # Checking text
-                elif parameter == 'text': notes = self.getNotesByText(keyword)
+                elif parameter == 'text': notes = self.byText(keyword)
 
                 # Checking title
                 elif parameter == 'title':
-                    notes = [i for i in [keyword] if self.backend.noteExists(keyword)]
+                    notes = [i for i in [keyword] if self.has(keyword)]
 
                 else:  notes = []
 
             except ValueError:
 
-                notes = self.getNotesByDate(item) + self.getNotesByTag(item) + self.getNotesByText(item)
-                if self.backend.noteExists(item):
-                    if item not in notes: notes.append(item)
+                notes = self.byDate(item) + self.byTag(item) + self.byText(item)
+                if self.has(item):
+                    if not item in notes: notes.append(item)
 
             results.append(notes)
-    
-        isection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).isection(isection(list[1::]))
+
+        isection = lambda list: set(list[0]) if len(list) == 1 else set(list[0]).intersection(isection(list[1::]))
 
         return list(isection(results))
     

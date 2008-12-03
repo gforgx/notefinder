@@ -31,7 +31,6 @@
 
 # Standard library imports
 import sys
-import pickle
 from datetime import datetime
 from time import localtime
 from inspect import isclass
@@ -78,13 +77,7 @@ class Application(Qt.QObject):
         translator.load('notefinder_' + Qt.QLocale.system().name() + '.qm', ':/')
         self.application.installTranslator(translator)
 
-        # Loading saved searches
-        self.searchesFile = os.path.expanduser("~/.config/notefinder/searches.dat")
-
-        try: self.searches = pickle.load(open(self.searchesFile))
-        except: self.searches = []
-
-        # Settings
+        # Default settings
         self.settings = {
             'Bool': {
                 'AutoSave' : True,
@@ -105,7 +98,8 @@ class Application(Qt.QObject):
                 'SplitterRight' : 1030,
             },
             'List': {
-                'Session' : []
+                'Session' : [],
+                'Searches' : [],
             }
         }
 
@@ -627,7 +621,7 @@ class Application(Qt.QObject):
             item.setToolTip(unicode('Notes (%i): %s' % (len(notes), ', '.join(notes)), 'utf'))
             item.type = 'tag'
 
-        for i in self.searches:
+        for i in self.settings['List']['Searches']:
             item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
             item.type = 'search'
         
@@ -669,7 +663,7 @@ class Application(Qt.QObject):
             except Exception, err:
                 self.showMessage(str(err))
         
-        self.mainWindow.ui.tabWidget.setTabText(0, unicode('%s > %s' % (self.notebook.name, desc)))
+        self.mainWindow.ui.tabWidget.setTabText(0, unicode('%s > %s' % (self.notebook.name, desc), 'utf'))
     
     def openDate(self):
         date = self.mainWindow.ui.dateEdit.date()
@@ -912,18 +906,19 @@ class Application(Qt.QObject):
         self.display(self.parameter)
     
     def saveSearch(self):
-        searchText = str(self.mainWindow.ui.searchEdit.text().toUtf8())
-        if searchText != '' and not searchText in self.searches:
-            self.searches.append(searchText)
-            pickle.dump(self.searches, open(self.searchesFile, 'w'))
+        s = str(self.mainWindow.ui.searchEdit.text().toUtf8())
+        if (s != '') and (not s in self.settings['List']['Searches']):
+            self.settings['List']['Searches'].append(s)
+            config.set('UI', 'Searches', '|||'.join(self.settings['List']['Searches']))
+            config.write(open(config.file, 'w'))
             self.refresh()
 
     def deleteSearch(self):
-        item = self.mainWindow.ui.metaList.currentItem()
-        if not item is None and item.type == 'search':
-            self.searches.remove(str(item.text().toUtf8()))
-            pickle.dump(self.searches, open(self.searchesFile, 'w'))
-            self.refresh()
+        s = str(self.mainWindow.ui.metaList.currentItem().text().toUtf8())
+        self.settings['List']['Searches'].remove(s)
+        config.set('UI', 'Searches', '|||'.join(self.settings['List']['Searches']))
+        config.write(open(config.file, 'w'))
+        self.refresh()
 
     def currentWidget(self):
         return self.mainWindow.ui.tabWidget.currentWidget()
