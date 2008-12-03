@@ -533,6 +533,7 @@ class Application(Qt.QObject):
             self.parameter = [self.notebook.notes]
             self.display(self.parameter)
         except Exception, err:
+            print err
             self.showMessage(str(err))
             if not fr:
                 self.setNotebook(previous, fr)
@@ -716,7 +717,7 @@ class Application(Qt.QObject):
                         html = text
 
                     item.setToolTip(unicode('Title: %s<br>Date: %s<br>Tags: %s<br>Text: %s<br>Length: %i characters' \
-                    % (i, note.getDate(), ', '.join(note.getTags()), html, len(text)), 'utf'))
+                    % (i, self.notebook.noteDate(i), ', '.join(self.notebook.noteTags(i)), html, len(text)), 'utf'))
             except:
                 pass
     
