@@ -130,21 +130,29 @@ class Application(Qt.QObject):
         self.mainWindow.closeEvent = self.closeEvent
 
         # Сontext menus
-        self.mainWindow.ui.notesList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionE_Mail)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionBacklinks)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionFindRelated)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionCreateIndex)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionMerge)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionRename)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionCopyEntry)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionOpenExternally)
-        self.mainWindow.ui.notesList.addAction(self.mainWindow.ui.actionDelete)
+        noteMenu = (
+            self.mainWindow.ui.actionE_Mail,
+            self.mainWindow.ui.actionBacklinks,
+            self.mainWindow.ui.actionFindRelated,
+            self.mainWindow.ui.actionCreateIndex,
+            self.mainWindow.ui.actionMerge,
+            self.mainWindow.ui.actionRename,
+            self.mainWindow.ui.actionCopyEntry,
+            self.mainWindow.ui.actionOpenExternally,
+            self.mainWindow.ui.actionDelete
+            )
 
+        metaMenu = (
+            self.mainWindow.ui.actionDeleteNotebook,
+            self.mainWindow.ui.actionDeleteTag,
+            self.mainWindow.ui.actionDeleteSelectedSearch
+            )
+
+        self.mainWindow.ui.notesList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
         self.mainWindow.ui.metaList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
-        self.mainWindow.ui.metaList.addAction(self.mainWindow.ui.actionDeleteNotebook)
-        self.mainWindow.ui.metaList.addAction(self.mainWindow.ui.actionDeleteTag)
-        self.mainWindow.ui.metaList.addAction(self.mainWindow.ui.actionDeleteSelectedSearch)
+
+        self.mainWindow.ui.notesList.addActions(noteMenu)
+        self.mainWindow.ui.metaList.addActions(metaMenu)
 
         self.connect(self.mainWindow.ui.actionAboutQt, Qt.SIGNAL('triggered()'), self.application.aboutQt)
         self.connect(self.mainWindow.ui.metaList, Qt.SIGNAL('itemSelectionChanged()'), self.refreshMenu)
@@ -197,6 +205,8 @@ class Application(Qt.QObject):
 
         # Tray
         self.tray = Qt.QSystemTrayIcon(self)
+        self.tray.setIcon(Qt.QIcon(':/icons/icon.png'))
+
         self.headerAction = Qt.QWidgetAction(self)
         self.headerFrame = Qt.QFrame()
         self.headerFrame.setFrameShape(Qt.QFrame.StyledPanel)
@@ -212,16 +222,13 @@ class Application(Qt.QObject):
         self.headerLayout.insertWidget(-1, self.headerText, 20)
         
         self.menu = Qt.QMenu()
-        self.menu.addAction(self.headerAction)
-        self.menu.addAction(self.mainWindow.ui.actionNew)
+        self.menu.addActions((self.headerAction, self.mainWindow.ui.actionNew))
         self.menu.addSeparator()
         self.pluginsMenu = Qt.QMenu('Plugins')
         self.menu.addMenu(self.pluginsMenu)
         self.menu.addSeparator()
-        self.menu.addAction(self.mainWindow.ui.actionPreferences)
-        self.menu.addAction(self.mainWindow.ui.actionExit)
+        self.menu.addActions((self.mainWindow.ui.actionPreferences, self.mainWindow.ui.actionExit))
         self.tray.setContextMenu(self.menu)
-        self.tray.setIcon(Qt.QIcon(':/icons/icon.png'))
         
         # Other dialogs
         self.aboutDialog = Qt.QDialog()
@@ -467,7 +474,6 @@ class Application(Qt.QObject):
         self.refresh()
 
     def loadPlugins(self):
-        """ Loads plugins """
         if PLUGINS:
             for ep in iter_entry_points('notefinder.plugins'):
                 try:
