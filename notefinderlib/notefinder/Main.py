@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI_I/main.ui'
+# Form implementation generated from reading ui file 'interface/main.ui'
 #
-# Created: Tue Nov 25 19:34:28 2008
+# Created: Thu Dec  4 17:36:08 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -179,11 +179,14 @@ class Ui_MainWindow(object):
         self.actionImage.setObjectName("actionImage")
         self.actionBulletedList = QtGui.QAction(MainWindow)
         self.actionBulletedList.setObjectName("actionBulletedList")
+        self.actionEncrypt = QtGui.QAction(MainWindow)
+        self.actionEncrypt.setObjectName("actionEncrypt")
         self.menuNoteFinder.addAction(self.actionPreferences)
         self.menuNoteFinder.addSeparator()
         self.menuNoteFinder.addAction(self.actionExit)
         self.menuEntry.addAction(self.actionNew)
         self.menuEntry.addAction(self.actionDelete)
+        self.menuEntry.addAction(self.actionEncrypt)
         self.menuEntry.addSeparator()
         self.menuEntry.addAction(self.actionCopyEntry)
         self.menuEntry.addAction(self.actionRename)
@@ -297,5 +300,6 @@ class Ui_MainWindow(object):
         self.actionAboutQt.setText(QtGui.QApplication.translate("MainWindow", "About Qt", None, QtGui.QApplication.UnicodeUTF8))
         self.actionImage.setText(QtGui.QApplication.translate("MainWindow", "Image", None, QtGui.QApplication.UnicodeUTF8))
         self.actionBulletedList.setText(QtGui.QApplication.translate("MainWindow", "Bulleted List", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionEncrypt.setText(QtGui.QApplication.translate("MainWindow", "Encrypt", None, QtGui.QApplication.UnicodeUTF8))
 
 import notefinder_rc

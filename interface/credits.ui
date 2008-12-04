@@ -16,7 +16,7 @@
    <string>Credits</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="notefinder.qrc" >
+   <iconset>
     <normaloff>:/about.png</normaloff>:/about.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
@@ -50,7 +50,8 @@ Russian l10n: Alexey Kolesnikov &lt;ackerman2007@gmail.com>
 iCal parser library: Max M &lt;maxm@mxm.dk>
 Mandriva mantainer: Funda Wang &lt;fundawang@mandriva.org>
 FeedParser library: Mark Pilgrim &lt;pilgrim@gmail.com>
-CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day &lt;stephen_day@gmail.com></string>
+CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day &lt;stephen_day@gmail.com>
+p3.py encryption framework: Paul Rubin </string>
          </property>
          <property name="alignment" >
           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

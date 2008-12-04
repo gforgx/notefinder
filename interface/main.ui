@@ -160,6 +160,7 @@
     </property>
     <addaction name="actionNew" />
     <addaction name="actionDelete" />
+    <addaction name="actionEncrypt" />
     <addaction name="separator" />
     <addaction name="actionCopyEntry" />
     <addaction name="actionRename" />
@@ -495,6 +496,11 @@
   <action name="actionBulletedList" >
    <property name="text" >
     <string>Bulleted List</string>
+   </property>
+  </action>
+  <action name="actionEncrypt" >
+   <property name="text" >
+    <string>Encrypt</string>
    </property>
   </action>
  </widget>

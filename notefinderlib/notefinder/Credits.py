@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/gforgx/UI_I/credits.ui'
+# Form implementation generated from reading ui file 'interface/credits.ui'
 #
-# Created: Tue Nov 25 19:31:29 2008
+# Created: Thu Dec  4 21:50:20 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -59,6 +59,7 @@ class Ui_CreditsDialog(object):
 "iCal parser library: Max M <maxm@mxm.dk>\n"
 "Mandriva mantainer: Funda Wang <fundawang@mandriva.org>\n"
 "FeedParser library: Mark Pilgrim <pilgrim@gmail.com>\n"
-"CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day <stephen_day@gmail.com>", None, QtGui.QApplication.UnicodeUTF8))
+"CreoleParser library (replaced PyCreole in 0.2.5): Stephan Day <stephen_day@gmail.com>\n"
+"p3.py encryption framework: Paul Rubin ", None, QtGui.QApplication.UnicodeUTF8))
 
 import notefinder_rc

@@ -36,6 +36,8 @@ import re
 from backend import *
 from config import *
 
+from notefinderlib.p3 import *
+
 config = Config()
 
 class Notebook(object):
@@ -52,7 +54,9 @@ class Notebook(object):
 
         self.Wiki = (self.markup == 'Wiki')
 
-    def add(self, note, text):
+    def add(self, note, text, key=None):
+        if not key is None:
+            text = p3_encrypt(text, key)
         self.backend.write(note, text)
 
     def tag(self, note, tags):
@@ -73,8 +77,11 @@ class Notebook(object):
         if move:
             self.delete(note)
 
-    def get(self, note):
-        return self.backend.getText(note)
+    def get(self, note, key=None):
+        if not key is None:
+            return p3_decrypt(self.backend.getText(note), key)
+        else:
+            return str(self.backend.getText(note))
 
     def noteDate(self, note):
         return self.backend.getNoteDate(note)

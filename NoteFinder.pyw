@@ -52,6 +52,8 @@ from notefinderlib.notefinder.About import Ui_AboutDialog
 from notefinderlib.notefinder.AddTag import Ui_AddTagDialog
 from notefinderlib.notefinder.CopyEntry import Ui_CopyDialog
 from notefinderlib.notefinder.Credits import Ui_CreditsDialog
+from notefinderlib.notefinder.Crypt import Ui_CryptDialog
+from notefinderlib.notefinder.Decrypt import Ui_DecryptDialog
 from notefinderlib.notefinder.Delete import Ui_DeleteDialog
 from notefinderlib.notefinder.DeleteNotebook import Ui_DeleteNotebookDialog
 from notefinderlib.notefinder.DeleteTag import Ui_DeleteTagDialog
@@ -139,6 +141,7 @@ class Application(Qt.QObject):
             self.mainWindow.ui.actionRename,
             self.mainWindow.ui.actionCopyEntry,
             self.mainWindow.ui.actionOpenExternally,
+            self.mainWindow.ui.actionEncrypt,
             self.mainWindow.ui.actionDelete
             )
 
@@ -257,6 +260,17 @@ class Application(Qt.QObject):
         self.creditsDialog.ui.setupUi(self.creditsDialog)
 
         self.connect(self.aboutDialog.ui.creditsButton, Qt.SIGNAL('clicked()'), self.creditsDialog.show)
+
+        self.cryptDialog = Qt.QDialog()
+        self.cryptDialog.ui = Ui_CryptDialog()
+        self.cryptDialog.ui.setupUi(self.cryptDialog)
+
+        self.connect(self.mainWindow.ui.actionEncrypt, Qt.SIGNAL('triggered()'), self.cryptDialog.show)
+        self.connect(self.cryptDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.encrypt)
+
+        self.decryptDialog = Qt.QDialog()
+        self.decryptDialog.ui = Ui_DecryptDialog()
+        self.decryptDialog.ui.setupUi(self.decryptDialog)
 
         self.deleteDialog = Qt.QDialog()
         self.deleteDialog.ui = Ui_DeleteDialog()
@@ -732,6 +746,9 @@ class Application(Qt.QObject):
             self.mainWindow.show()
         tab = EditorWidget(self)
         tab.ui.nameEdit.setEnabled(True)
+
+        tab.key = None
+
         if name is None:
             name = 'New note %s' % (datetime.strftime(datetime.today(), '%Y-%m-%d %H-%M-%S'))
         if not text is None:
@@ -768,26 +785,42 @@ class Application(Qt.QObject):
         # Creating Note instance
         tab.note = entry
         tab.ui.date.setText(self.trUtf8(self.notebook.noteDate(entry)))
-        tab.ui.textEdit.setPlainText(unicode(self.notebook.get(entry), 'utf'))
+
+        if entry in config.options('Encrypted'):
+            key = str(Qt.QInputDialog.getText(self.mainWindow, 'Enter key', 'Key: ', Qt.QLineEdit.Password)[0].toUtf8())
+        else:
+            key = None
+
+        try:
+            text = self.notebook.get(entry, key)
+
+            tab.key = key
+
+            tab.ui.textEdit.setPlainText(unicode(text, 'utf'))
     
-        # Displaying tags
-        for i in (tab.ui.tagEdit, tab.ui.tagsList, tab.ui.addTagButton, tab.ui.delTagButton, tab.ui.autoTagButton):
-            i.setHidden(not self.notebook.backend.Tag)
+            # Displaying tags
+            for i in (tab.ui.tagEdit, tab.ui.tagsList, tab.ui.addTagButton, tab.ui.delTagButton, tab.ui.autoTagButton):
+                i.setHidden(not self.notebook.backend.Tag)
     
-        if self.notebook.backend.Tag:
-            for tag in self.notebook.noteTags(entry):
-                tab.addTag(tag)
+            if self.notebook.backend.Tag:
+                for tag in self.notebook.noteTags(entry):
+                    tab.addTag(tag)
+    
+            self.mainWindow.ui.tabWidget.addTab(tab, '')
+            self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
+            self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
+            self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
 
-        self.mainWindow.ui.tabWidget.addTab(tab, "")
-        self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
-        self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
-        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
+            if self.settings['Bool']['Sessions']:
+                if not entry in self.settings['List']['Session']:
+                    self.settings['List']['Session'].append(entry)
 
-        if self.settings['Bool']['Sessions']:
-            if not entry in self.settings['List']['Session']:
-                self.settings['List']['Session'].append(entry)
+                    self.saveSession()
 
-                self.saveSession()
+        except Exception, err:
+            self.showMessage(str(err))
+
+
 
         # If search was performed:
         if self.parameter[0] == self.notebook.search:
@@ -808,7 +841,7 @@ class Application(Qt.QObject):
                 self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(widget), unicode(widget.note, 'utf'))
 
             try:
-                self.notebook.add(widget.note, text)
+                self.notebook.add(widget.note, text, widget.key)
                 self.notebook.tag(widget.note, tags)
                 self.refresh()
                 widget.ui.nameEdit.setEnabled(False)
@@ -854,18 +887,54 @@ class Application(Qt.QObject):
                 Qt.QDesktopServices().openUrl(Qt.QUrl(unicode(self.notebook.url(name), 'utf')))
     
     def deleteNotes(self):
+        if not config.has_section('Encrypted'):
+            config.add_section('Encrypted')
+            
         for note in self.selectedNotes():
             self.notebook.delete(note)
+            if note in config.options('Encrypted'):
+                config.remove_option('Encrypted', note)
+
+        config.write(open(config.file, 'w'))
         self.refresh()
    
     def renameNote(self):
         if len(self.selectedNotes()) == 1:
+            c = self.currentNote()
+
+            if not config.has_section('Encrypted'):
+                config.add_section('Encrypted')
+
             name = str(self.renameDialog.ui.lineEdit.text().toUtf8())
-            if name != '' and not name in self.notebook.getNotes():
-                self.notebook.rename(self.currentNote(), name)
+            if name != '' and not name in self.notebook.notes():
+                self.notebook.rename(c, name)
+
+                if c in config.options('Encrypted'):
+
+                    config.remove_option('Encrypted', c)
+                    config.set('Encrypted', name, 'Yes')
+
+                    config.write(open(config.file, 'w'))
+
                 self.refresh()
         else:
             self.showMessage('Only 1 note can be renamed at a time')
+
+    def encrypt(self):
+        key = str(self.cryptDialog.ui.keyEdit.text().toUtf8())
+
+        if not config.has_section('Encrypted'):
+            config.add_section('Encrypted')
+
+        for i in self.selectedNotes():
+            self.notebook.add(i, self.notebook.get(i), key)
+            config.set('Encrypted', i, 'Yes')
+
+        config.write(open(config.file, 'w'))
+
+    def decrypt(self):
+        self.decryptDialog.show()
+        return str(self.decryptDialog.ui.keyEdit.text().toUtf8())
 
     def copyEntry(self):
         move = self.copyDialog.ui.deleteBox.isChecked()
