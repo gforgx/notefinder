@@ -36,11 +36,6 @@ from PyQt4 import Qt
 from notefinderlib.libnotetaking import *
 from notefinderlib.notefinder import plugin, notefinder_rc
 
-# You can change some settings here
-dialog = 'kdialog'
-wtitle = '--title'
-wmsg = '--msgbox'
-
 class Remind(plugin.Plugin):
     
     name = 'Remind'
@@ -74,9 +69,8 @@ class Remind(plugin.Plugin):
     def add(self):
         if len(self.app.selectedNotes()) == 1:
             title = self.app.currentNote()
-            text = self.app.notebook.get(title)
             time = str(self.timeEdit.text().toUtf8())
-            os.system('echo "DISPLAY=:0 %s %s \'%s\' %s \'%s\'" | at %s' % (dialog, wtitle, title, wmsg, text, time))
+            os.system('echo "DISPLAY=:0 Reminder.py \'%s\' \'%s\'" | at %s' % (self.app.notebook.name, title, time))
             self.dialog.close()
         else:
             self.showMessage('You should select one entry')
