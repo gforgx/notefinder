@@ -983,6 +983,9 @@ class Application(Qt.QObject):
         self.display(self.parameter)
     
     def saveSearch(self):
+        if not config.has_section('UI'):
+            config.add_section('UI')
+
         s = str(self.mainWindow.ui.searchEdit.text().toUtf8())
         if (s != '') and (not s in self.settings['List']['Searches']):
             self.settings['List']['Searches'].append(s)
@@ -991,6 +994,9 @@ class Application(Qt.QObject):
             self.refresh()
 
     def deleteSearch(self):
+        if not config.has_section('UI'):
+            config.add_section('UI')
+
         s = str(self.mainWindow.ui.metaList.currentItem().text().toUtf8())
         self.settings['List']['Searches'].remove(s)
         config.set('UI', 'Searches', '|||'.join(self.settings['List']['Searches']))
@@ -1089,6 +1095,9 @@ class Application(Qt.QObject):
         config.write(open(config.file, 'w'))
 
     def saveSession(self):
+        if not config.has_section('UI'):
+            config.add_section('UI')
+
         config.set('UI', 'Session', '|||'.join(self.settings['List']['Session']))
         config.write(open(config.file, 'w'))   
 
