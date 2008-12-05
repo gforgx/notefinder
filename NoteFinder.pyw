@@ -930,8 +930,11 @@ class Application(Qt.QObject):
         key = str(self.cryptDialog.ui.keyEdit.text().toUtf8())
 
         for i in self.selectedNotes():
-            self.notebook.add(i, self.notebook.get(i), key)
-            self.addEncrypted(i)
+            if not i in self.encrypted[self.notebook.name]:
+                self.notebook.add(i, self.notebook.get(i), key)
+                self.addEncrypted(i)
+            else:
+                self.showMessage('Some entries are already encrypted')
 
         self.refresh()
 
