@@ -715,7 +715,7 @@ class Application(Qt.QObject):
     
     def backlinks(self):
         if len(self.selectedNotes()) == 1:
-            self.parameter = [self.backlinks, self.currentNote()]
+            self.parameter = [self.notebook.backlinks, self.currentNote()]
             self.display(self.parameter)
     
     def search(self, text = None):
