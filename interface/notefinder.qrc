@@ -1,5 +1,9 @@
 <RCC>
   <qresource prefix="/" >
+    <file>icons/default/encrypt.png</file>
+    <file>icons/oxygen/encrypt.png</file>
+    <file>icons/silk/encrypt.png</file>
+    <file>icons/tango/encrypt.png</file>
     <file>icons/silk/rename.png</file>
     <file>icons/silk/add.png</file>
     <file>icons/silk/list.png</file>

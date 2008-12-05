@@ -30,7 +30,9 @@
 #       OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 # Standard library imports
+import os
 import sys
+import pickle
 from datetime import datetime
 from time import localtime
 from inspect import isclass
@@ -118,94 +120,98 @@ class Application(Qt.QObject):
             'Mail': ':/icons/%s/mail.png' % (self.settings['String']['Icons'])
         }
 
+        try:
+            self.encrypted = pickle.load(open(os.path.expanduser('~/.config/notefinder/crypt.dat')))
+        except:
+            self.encrypted = {}
 
         # Main window stuff
-        self.mainWindow = Qt.QMainWindow()
-        self.mainWindow.ui = Ui_MainWindow()
-        self.mainWindow.ui.setupUi(self.mainWindow)
-        self.mainWindow.setWindowIcon(Qt.QIcon(':/icons/icon.png'))
+        self.mW = Qt.QMainWindow()
+        self.mW.ui = Ui_MainWindow()
+        self.mW.ui.setupUi(self.mW)
+        self.mW.setWindowIcon(Qt.QIcon(':/icons/icon.png'))
     
-        self.mainWindow.ui.closeButton = Qt.QToolButton(self.mainWindow)
-        self.mainWindow.ui.closeButton.setShortcut('Ctrl+W')
-        self.mainWindow.ui.tabWidget.setCornerWidget(self.mainWindow.ui.closeButton)
+        self.mW.ui.closeButton = Qt.QToolButton(self.mW)
+        self.mW.ui.closeButton.setShortcut('Ctrl+W')
+        self.mW.ui.tabWidget.setCornerWidget(self.mW.ui.closeButton)
 
-        self.mainWindow.closeEvent = self.closeEvent
+        self.mW.closeEvent = self.closeEvent
 
         # Сontext menus
         noteMenu = (
-            self.mainWindow.ui.actionE_Mail,
-            self.mainWindow.ui.actionBacklinks,
-            self.mainWindow.ui.actionFindRelated,
-            self.mainWindow.ui.actionCreateIndex,
-            self.mainWindow.ui.actionMerge,
-            self.mainWindow.ui.actionRename,
-            self.mainWindow.ui.actionCopyEntry,
-            self.mainWindow.ui.actionOpenExternally,
-            self.mainWindow.ui.actionEncrypt,
-            self.mainWindow.ui.actionDelete
+            self.mW.ui.actionE_Mail,
+            self.mW.ui.actionBacklinks,
+            self.mW.ui.actionFindRelated,
+            self.mW.ui.actionCreateIndex,
+            self.mW.ui.actionMerge,
+            self.mW.ui.actionRename,
+            self.mW.ui.actionCopyEntry,
+            self.mW.ui.actionOpenExternally,
+            self.mW.ui.actionEncrypt,
+            self.mW.ui.actionDelete
             )
 
         metaMenu = (
-            self.mainWindow.ui.actionDeleteNotebook,
-            self.mainWindow.ui.actionDeleteTag,
-            self.mainWindow.ui.actionDeleteSelectedSearch
+            self.mW.ui.actionDeleteNotebook,
+            self.mW.ui.actionDeleteTag,
+            self.mW.ui.actionDeleteSelectedSearch
             )
 
-        self.mainWindow.ui.notesList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
-        self.mainWindow.ui.metaList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
+        self.mW.ui.notesList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
+        self.mW.ui.metaList.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
 
-        self.mainWindow.ui.notesList.addActions(noteMenu)
-        self.mainWindow.ui.metaList.addActions(metaMenu)
+        self.mW.ui.notesList.addActions(noteMenu)
+        self.mW.ui.metaList.addActions(metaMenu)
 
-        self.connect(self.mainWindow.ui.actionAboutQt, Qt.SIGNAL('triggered()'), self.application.aboutQt)
-        self.connect(self.mainWindow.ui.metaList, Qt.SIGNAL('itemSelectionChanged()'), self.refreshMenu)
-        self.connect(self.mainWindow.ui.closeButton, Qt.SIGNAL('clicked()'), self.closeTab)
-        self.connect(self.mainWindow.ui.actionExit, Qt.SIGNAL('triggered()'), self.application.quit)
+        self.connect(self.mW.ui.actionAboutQt, Qt.SIGNAL('triggered()'), self.application.aboutQt)
+        self.connect(self.mW.ui.metaList, Qt.SIGNAL('itemSelectionChanged()'), self.refreshMenu)
+        self.connect(self.mW.ui.closeButton, Qt.SIGNAL('clicked()'), self.closeTab)
+        self.connect(self.mW.ui.actionExit, Qt.SIGNAL('triggered()'), self.application.quit)
         
-        self.connect(self.mainWindow.ui.dateEdit, Qt.SIGNAL('editingFinished()'), self.openDate)
-        self.connect(self.mainWindow.ui.metaList, Qt.SIGNAL('itemClicked(QListWidgetItem *)'), self.openMeta)
-        self.connect(self.mainWindow.ui.searchEdit, QtCore.SIGNAL("returnPressed()"), self.search)
+        self.connect(self.mW.ui.dateEdit, Qt.SIGNAL('editingFinished()'), self.openDate)
+        self.connect(self.mW.ui.metaList, Qt.SIGNAL('itemClicked(QListWidgetItem *)'), self.openMeta)
+        self.connect(self.mW.ui.searchEdit, QtCore.SIGNAL("returnPressed()"), self.search)
         
-        self.connect(self.mainWindow.ui.actionNew, Qt.SIGNAL('triggered()'), self.new)
-        self.connect(self.mainWindow.ui.actionCreateIndex,  Qt.SIGNAL('triggered()'), self.buildListIndex)
-        self.connect(self.mainWindow.ui.actionMerge, Qt.SIGNAL('triggered()'), self.merge)
-        self.connect(self.mainWindow.ui.notesList, Qt.SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.openFromList) 
-        self.connect(self.mainWindow.ui.actionSave, Qt.SIGNAL('triggered()'), self.saveNote)
+        self.connect(self.mW.ui.actionNew, Qt.SIGNAL('triggered()'), self.new)
+        self.connect(self.mW.ui.actionCreateIndex,  Qt.SIGNAL('triggered()'), self.buildListIndex)
+        self.connect(self.mW.ui.actionMerge, Qt.SIGNAL('triggered()'), self.merge)
+        self.connect(self.mW.ui.notesList, Qt.SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.openFromList) 
+        self.connect(self.mW.ui.actionSave, Qt.SIGNAL('triggered()'), self.saveNote)
 
-        self.connect(self.mainWindow.ui.actionE_Mail, Qt.SIGNAL('triggered()'), self.email)
-        self.connect(self.mainWindow.ui.actionOpenExternally, Qt.SIGNAL('triggered()'), self.openExternally)
-        self.connect(self.mainWindow.ui.actionFindRelated, Qt.SIGNAL('triggered()'), self.findRelated)
-        self.connect(self.mainWindow.ui.actionBacklinks, Qt.SIGNAL('triggered()'), self.backlinks)
+        self.connect(self.mW.ui.actionE_Mail, Qt.SIGNAL('triggered()'), self.email)
+        self.connect(self.mW.ui.actionOpenExternally, Qt.SIGNAL('triggered()'), self.openExternally)
+        self.connect(self.mW.ui.actionFindRelated, Qt.SIGNAL('triggered()'), self.findRelated)
+        self.connect(self.mW.ui.actionBacklinks, Qt.SIGNAL('triggered()'), self.backlinks)
 
-        self.connect(self.mainWindow.ui.actionAll, Qt.SIGNAL('triggered()'), self.showAll)
-        self.connect(self.mainWindow.ui.actionToday, Qt.SIGNAL('triggered()'), self.today)
+        self.connect(self.mW.ui.actionAll, Qt.SIGNAL('triggered()'), self.showAll)
+        self.connect(self.mW.ui.actionToday, Qt.SIGNAL('triggered()'), self.today)
         
-        self.connect(self.mainWindow.ui.saveSearchButton, Qt.SIGNAL('clicked()'), self.saveSearch)
-        self.connect(self.mainWindow.ui.actionDeleteSelectedSearch, Qt.SIGNAL('triggered()'), self.deleteSearch)
+        self.connect(self.mW.ui.saveSearchButton, Qt.SIGNAL('clicked()'), self.saveSearch)
+        self.connect(self.mW.ui.actionDeleteSelectedSearch, Qt.SIGNAL('triggered()'), self.deleteSearch)
 
-        self.connect(self.mainWindow.ui.actionBold, Qt.SIGNAL('triggered()'), self.bold)
-        self.connect(self.mainWindow.ui.actionItalic, Qt.SIGNAL('triggered()'), self.italic)
-        self.connect(self.mainWindow.ui.actionUnderlined, Qt.SIGNAL('triggered()'), self.underline)
-        self.connect(self.mainWindow.ui.actionHighlight, Qt.SIGNAL('triggered()'), self.highlight)
-        self.connect(self.mainWindow.ui.actionImage, Qt.SIGNAL('triggered()'), self.image)
-        self.connect(self.mainWindow.ui.actionTimestamp, Qt.SIGNAL('triggered()'), self.insertTime)
-        self.connect(self.mainWindow.ui.actionBulletedList, Qt.SIGNAL('triggered()'), self.list)
+        self.connect(self.mW.ui.actionBold, Qt.SIGNAL('triggered()'), self.bold)
+        self.connect(self.mW.ui.actionItalic, Qt.SIGNAL('triggered()'), self.italic)
+        self.connect(self.mW.ui.actionUnderlined, Qt.SIGNAL('triggered()'), self.underline)
+        self.connect(self.mW.ui.actionHighlight, Qt.SIGNAL('triggered()'), self.highlight)
+        self.connect(self.mW.ui.actionImage, Qt.SIGNAL('triggered()'), self.image)
+        self.connect(self.mW.ui.actionTimestamp, Qt.SIGNAL('triggered()'), self.insertTime)
+        self.connect(self.mW.ui.actionBulletedList, Qt.SIGNAL('triggered()'), self.list)
 
-        self.connect(self.mainWindow.ui.splitter, Qt.SIGNAL('splitterMoved (int,int)'), self.saveSizer)
+        self.connect(self.mW.ui.splitter, Qt.SIGNAL('splitterMoved (int,int)'), self.saveSizer)
 
         self.writeActions = (
-            self.mainWindow.ui.actionNew,
-            self.mainWindow.ui.actionRename,
-            self.mainWindow.ui.actionDelete,
-            self.mainWindow.ui.actionSave,
-            self.mainWindow.ui.actionEncrypt,
+            self.mW.ui.actionNew,
+            self.mW.ui.actionRename,
+            self.mW.ui.actionDelete,
+            self.mW.ui.actionSave,
+            self.mW.ui.actionEncrypt,
             )
 
         self.wikiActions = (
-            self.mainWindow.ui.actionBacklinks,
-            self.mainWindow.ui.actionCreateIndex,
-            self.mainWindow.ui.actionMerge
-        )
+            self.mW.ui.actionBacklinks,
+            self.mW.ui.actionCreateIndex,
+            self.mW.ui.actionMerge
+            )
 
         # Tray
         self.tray = Qt.QSystemTrayIcon(self)
@@ -226,12 +232,12 @@ class Application(Qt.QObject):
         self.headerLayout.insertWidget(-1, self.headerText, 20)
         
         self.menu = Qt.QMenu()
-        self.menu.addActions((self.headerAction, self.mainWindow.ui.actionNew))
+        self.menu.addActions((self.headerAction, self.mW.ui.actionNew))
         self.menu.addSeparator()
         self.pluginsMenu = Qt.QMenu('Plugins')
         self.menu.addMenu(self.pluginsMenu)
         self.menu.addSeparator()
-        self.menu.addActions((self.mainWindow.ui.actionPreferences, self.mainWindow.ui.actionExit))
+        self.menu.addActions((self.mW.ui.actionPreferences, self.mW.ui.actionExit))
         self.tray.setContextMenu(self.menu)
         
         # Other dialogs
@@ -240,20 +246,20 @@ class Application(Qt.QObject):
         self.aboutDialog.ui.setupUi(self.aboutDialog)
         self.aboutDialog.ui.versionLabel.setText('<h2>%s</h2>' % (__version__))
 
-        self.connect(self.mainWindow.ui.actionAbout, Qt.SIGNAL('triggered()'), self.aboutDialog.show)
+        self.connect(self.mW.ui.actionAbout, Qt.SIGNAL('triggered()'), self.aboutDialog.show)
 
         self.addTagDialog = Qt.QDialog()
         self.addTagDialog.ui = Ui_AddTagDialog()
         self.addTagDialog.ui.setupUi(self.addTagDialog)
  
-        self.connect(self.mainWindow.ui.actionAddTag, Qt.SIGNAL('triggered()'), self.addTagDialog.show)
+        self.connect(self.mW.ui.actionAddTag, Qt.SIGNAL('triggered()'), self.addTagDialog.show)
         self.connect(self.addTagDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.addTag)
 
         self.copyDialog = Qt.QDialog()
         self.copyDialog.ui = Ui_CopyDialog()
         self.copyDialog.ui.setupUi(self.copyDialog)
 
-        self.connect(self.mainWindow.ui.actionCopyEntry, Qt.SIGNAL('triggered()'), self.copyDialog.show)
+        self.connect(self.mW.ui.actionCopyEntry, Qt.SIGNAL('triggered()'), self.copyDialog.show)
         self.connect(self.copyDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.copyEntry)
 
         self.creditsDialog = Qt.QDialog()
@@ -266,32 +272,28 @@ class Application(Qt.QObject):
         self.cryptDialog.ui = Ui_CryptDialog()
         self.cryptDialog.ui.setupUi(self.cryptDialog)
 
-        self.connect(self.mainWindow.ui.actionEncrypt, Qt.SIGNAL('triggered()'), self.cryptDialog.show)
+        self.connect(self.mW.ui.actionEncrypt, Qt.SIGNAL('triggered()'), self.cryptDialog.show)
         self.connect(self.cryptDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.encrypt)
-
-        self.decryptDialog = Qt.QDialog()
-        self.decryptDialog.ui = Ui_DecryptDialog()
-        self.decryptDialog.ui.setupUi(self.decryptDialog)
 
         self.deleteDialog = Qt.QDialog()
         self.deleteDialog.ui = Ui_DeleteDialog()
         self.deleteDialog.ui.setupUi(self.deleteDialog)
 
-        self.connect(self.mainWindow.ui.actionDelete, Qt.SIGNAL('triggered()'), self.deleteDialog.show)
+        self.connect(self.mW.ui.actionDelete, Qt.SIGNAL('triggered()'), self.deleteDialog.show)
         self.connect(self.deleteDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.deleteNotes)
         
         self.deleteNotebookDialog = Qt.QDialog()
         self.deleteNotebookDialog.ui = Ui_DeleteNotebookDialog()
         self.deleteNotebookDialog.ui.setupUi(self.deleteNotebookDialog)
 
-        self.connect(self.mainWindow.ui.actionDeleteNotebook, Qt.SIGNAL('triggered()'), self.deleteNotebookDialog.show)
+        self.connect(self.mW.ui.actionDeleteNotebook, Qt.SIGNAL('triggered()'), self.deleteNotebookDialog.show)
         self.connect(self.deleteNotebookDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.deleteNotebook)
 
         self.deleteTagDialog = Qt.QDialog()
         self.deleteTagDialog.ui = Ui_DeleteTagDialog()
         self.deleteTagDialog.ui.setupUi(self.deleteTagDialog)
 
-        self.connect(self.mainWindow.ui.actionDeleteTag, Qt.SIGNAL('triggered()'), self.deleteTagDialog.show)
+        self.connect(self.mW.ui.actionDeleteTag, Qt.SIGNAL('triggered()'), self.deleteTagDialog.show)
         self.connect(self.deleteTagDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.deleteTag)
 
         self.licenseDialog = Qt.QDialog()
@@ -314,7 +316,7 @@ class Application(Qt.QObject):
         
         self.selectBackend()
 
-        self.connect(self.mainWindow.ui.actionAddNotebook, Qt.SIGNAL('triggered()'), self.notebookDialog.show)
+        self.connect(self.mW.ui.actionAddNotebook, Qt.SIGNAL('triggered()'), self.notebookDialog.show)
         self.connect(self.notebookDialog.ui.backends, Qt.SIGNAL('currentIndexChanged(const QString)'), self.selectBackend)
         self.connect(self.notebookDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.addNotebook)
 
@@ -322,7 +324,7 @@ class Application(Qt.QObject):
         self.renameDialog.ui = Ui_RenameDialog()
         self.renameDialog.ui.setupUi(self.renameDialog)
 
-        self.connect(self.mainWindow.ui.actionRename, Qt.SIGNAL('triggered()'), self.renameDialog.show)
+        self.connect(self.mW.ui.actionRename, Qt.SIGNAL('triggered()'), self.renameDialog.show)
         self.connect(self.renameDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.renameNote)
         
         # Settings dialog
@@ -333,7 +335,7 @@ class Application(Qt.QObject):
         self.settingsDialog.ui.listWidget.setContextMenuPolicy(Qt.Qt.ActionsContextMenu)
         self.settingsDialog.ui.listWidget.addAction(self.settingsDialog.ui.updatePluginAction)
 
-        self.connect(self.mainWindow.ui.actionPreferences, Qt.SIGNAL('triggered()'), self.settingsDialog.show)
+        self.connect(self.mW.ui.actionPreferences, Qt.SIGNAL('triggered()'), self.settingsDialog.show)
         self.connect(self.settingsDialog.ui.buttonBox, Qt.SIGNAL('accepted()'), self.writeSettings)
         self.connect(self.settingsDialog.ui.listWidget, Qt.SIGNAL('itemSelectionChanged()'), self.updatePluginMenu)
         self.connect(self.settingsDialog.ui.updatePluginAction, Qt.SIGNAL('triggered()'), self.setPlugins)
@@ -345,7 +347,7 @@ class Application(Qt.QObject):
         
         self.readSettings()
         self.applySettings()
-        self.mainWindow.ui.splitter.setSizes([self.settings['Int']['SplitterLeft'], self.settings['Int']['SplitterRight']])
+        self.mW.ui.splitter.setSizes([self.settings['Int']['SplitterLeft'], self.settings['Int']['SplitterRight']])
         
         # Initializing notebook
         self.setNotebook(config.getNotebook(), True)
@@ -405,47 +407,48 @@ class Application(Qt.QObject):
             self.connect(self.tray, Qt.SIGNAL('activated(QSystemTrayIcon::ActivationReason)'), self.showHide)
 
         if self.settings['Bool']['SearchOnTheFly']:
-            self.connect(self.mainWindow.ui.searchEdit, Qt.SIGNAL('textChanged(const QString)'), self.search)
+            self.connect(self.mW.ui.searchEdit, Qt.SIGNAL('textChanged(const QString)'), self.search)
     
         self.setIcons()
 
     def setIcons(self):
         # Main window
         ## Action icons
-        self.mainWindow.ui.actionNew.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionSave.setIcon(Qt.QIcon(':/icons/%s/save.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionDelete.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionAll.setIcon(Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionToday.setIcon(Qt.QIcon(':/icons/%s/calendar.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionBold.setIcon(Qt.QIcon(':/icons/%s/bold.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionUnderlined.setIcon(Qt.QIcon(':/icons/%s/underline.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionHighlight.setIcon(Qt.QIcon(':/icons/%s/highlight.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionItalic.setIcon(Qt.QIcon(':/icons/%s/italic.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionBulletedList.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionImage.setIcon(Qt.QIcon(':/icons/%s/image.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionTimestamp.setIcon(Qt.QIcon(':/icons/%s/time.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionPreferences.setIcon(Qt.QIcon(':/icons/%s/preferences.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionExit.setIcon(Qt.QIcon(':/icons/%s/exit.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionAddNotebook.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionDeleteNotebook.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionAddTag.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionDeleteTag.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionCopyEntry.setIcon(Qt.QIcon(':/icons/%s/copy.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionRename.setIcon(Qt.QIcon(':/icons/%s/rename.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionE_Mail.setIcon(Qt.QIcon(':/icons/%s/mail.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionBacklinks.setIcon(Qt.QIcon(':/icons/%s/undo.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionFindRelated.setIcon(Qt.QIcon(':/icons/%s/find.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionCreateIndex.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionMerge.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionOpenExternally.setIcon(Qt.QIcon(':/icons/%s/open.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionAbout.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionAboutQt.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
-        self.mainWindow.ui.actionDeleteSelectedSearch.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionNew.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionSave.setIcon(Qt.QIcon(':/icons/%s/save.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionDelete.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionEncrypt.setIcon(Qt.QIcon(':/icons/%s/encrypt.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionAll.setIcon(Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionToday.setIcon(Qt.QIcon(':/icons/%s/calendar.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionBold.setIcon(Qt.QIcon(':/icons/%s/bold.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionUnderlined.setIcon(Qt.QIcon(':/icons/%s/underline.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionHighlight.setIcon(Qt.QIcon(':/icons/%s/highlight.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionItalic.setIcon(Qt.QIcon(':/icons/%s/italic.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionBulletedList.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionImage.setIcon(Qt.QIcon(':/icons/%s/image.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionTimestamp.setIcon(Qt.QIcon(':/icons/%s/time.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionPreferences.setIcon(Qt.QIcon(':/icons/%s/preferences.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionExit.setIcon(Qt.QIcon(':/icons/%s/exit.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionAddNotebook.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionDeleteNotebook.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionAddTag.setIcon(Qt.QIcon(':/icons/%s/add.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionDeleteTag.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionCopyEntry.setIcon(Qt.QIcon(':/icons/%s/copy.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionRename.setIcon(Qt.QIcon(':/icons/%s/rename.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionE_Mail.setIcon(Qt.QIcon(':/icons/%s/mail.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionBacklinks.setIcon(Qt.QIcon(':/icons/%s/undo.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionFindRelated.setIcon(Qt.QIcon(':/icons/%s/find.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionCreateIndex.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionMerge.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionOpenExternally.setIcon(Qt.QIcon(':/icons/%s/open.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionAbout.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionAboutQt.setIcon(Qt.QIcon(':/icons/%s/about.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionDeleteSelectedSearch.setIcon(Qt.QIcon(':/icons/%s/delete.png' % (self.settings['String']['Icons'])))
 
         ## Misc
-        self.mainWindow.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.tabWidget.setTabIcon(0, Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
 
-        self.mainWindow.ui.closeButton.setIcon(Qt.QIcon(':/icons/%s/close.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.closeButton.setIcon(Qt.QIcon(':/icons/%s/close.png' % (self.settings['String']['Icons'])))
 
         # Dialogs
         self.deleteDialog.ui.label.setPixmap(Qt.QPixmap(':/icons/%s/small/delete.png' % (self.settings['String']['Icons'])))
@@ -550,9 +553,14 @@ class Application(Qt.QObject):
 
         try:
             self.notebook = Notebook(notebook)
+
+            if not self.notebook.name in self.encrypted:
+                self.encrypted[self.notebook.name] = []
+
             config.setDefault(notebook)
             self.parameter = [self.notebook.notes]
             self.display(self.parameter)
+
         except Exception, err:
             print err
             self.showMessage(str(err))
@@ -565,9 +573,9 @@ class Application(Qt.QObject):
         for i in self.writeActions: i.setVisible(not self.notebook.backend.ReadOnly)
         for i in self.wikiActions: i.setVisible(self.notebook.Wiki)
 
-        self.mainWindow.ui.dateEdit.setVisible(self.notebook.backend.Date)
-        self.mainWindow.ui.menuTag.setEnabled(self.notebook.backend.Tag)
-        self.mainWindow.ui.actionOpenExternally.setVisible(self.notebook.backend.URL)
+        self.mW.ui.dateEdit.setVisible(self.notebook.backend.Date)
+        self.mW.ui.menuTag.setEnabled(self.notebook.backend.Tag)
+        self.mW.ui.actionOpenExternally.setVisible(self.notebook.backend.URL)
 
         if not fr:
             if self.settings['Bool']['Sessions']:
@@ -576,31 +584,31 @@ class Application(Qt.QObject):
                 self.saveSession()
 
     def closeTab(self):
-        tab = self.mainWindow.ui.tabWidget.currentIndex()
+        tab = self.mW.ui.tabWidget.currentIndex()
 
         if self.settings['Bool']['Sessions']:
             try:
-                self.settings['List']['Session'].remove(self.mainWindow.ui.tabWidget.currentWidget().note)
+                self.settings['List']['Session'].remove(self.mW.ui.tabWidget.currentWidget().note)
                 self.saveSession()
             except:
                 pass
         
-        if tab != 0: self.mainWindow.ui.tabWidget.removeTab(tab)
+        if tab != 0: self.mW.ui.tabWidget.removeTab(tab)
 
     def showHide(self, reason):
         if reason == Qt.QSystemTrayIcon.Trigger:
-            if self.mainWindow.isHidden():
-                self.mainWindow.show()
-                self.mainWindow.activateWindow()
+            if self.mW.isHidden():
+                self.mW.show()
+                self.mW.activateWindow()
             else:
-                self.mainWindow.hide()
+                self.mW.hide()
 
     def showMessage(self, message):
         self.messageDialog.ui.message.setText(unicode(message, 'utf'))
         self.messageDialog.show()
 
     def refresh(self):
-        self.mainWindow.ui.metaList.clear()
+        self.mW.ui.metaList.clear()
         self.copyDialog.ui.notebooks.clear()
 
         notebooks = config.getNotebooks()
@@ -614,7 +622,7 @@ class Application(Qt.QObject):
                 if self.settings['Bool']['BackendIcons']: icon = self.backendIcons[backend]
                 else: icon = ':/icons/%s/notebook.png' % (self.settings['String']['Icons'])
 
-                item = Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+                item = Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.mW.ui.metaList)
                 if not i == self.notebook.name and not backends[backend].ReadOnly:
                     Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.copyDialog.ui.notebooks)
                 item.setToolTip(self.trUtf8('Backend: %s' % backend))
@@ -623,28 +631,28 @@ class Application(Qt.QObject):
                 if i == self.notebook.name:
                     item.setFont(self.boldFont)
 
-        self.mainWindow.ui.dateEdit.setDate(Qt.QDate.currentDate())
+        self.mW.ui.dateEdit.setDate(Qt.QDate.currentDate())
 
         dates = self.notebook.dates()
         dates.sort()
 
         if self.settings['Bool']['Dates']:
             for i in dates:
-                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/date.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/date.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mW.ui.metaList)
                 item.type = 'date'
 
         tags = self.notebook.tags()
         tags.sort()
 
         for i in tags:
-            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mW.ui.metaList)
 
             notes = self.notebook.byTag(i)
             item.setToolTip(unicode('Notes (%i): %s' % (len(notes), ', '.join(notes)), 'utf'))
             item.type = 'tag'
 
         for i in self.settings['List']['Searches']:
-            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.metaList)
+            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/search.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mW.ui.metaList)
             item.type = 'search'
         
         # Displaying entries
@@ -652,14 +660,12 @@ class Application(Qt.QObject):
 
         # Adding search completer items
         if self.settings['Bool']['SearchCompletion']:
-            self.completer = Qt.QCompleter(['tag:' + unicode(i, 'utf') for i in tags] \
-            + ['date:' + unicode(i, 'utf') for i in dates])
-            self.mainWindow.ui.searchEdit.setCompleter(self.completer)
+            self.completer = Qt.QCompleter(['tag:' + unicode(i, 'utf') for i in tags] + ['date:' + unicode(i, 'utf') for i in dates])
+            self.mW.ui.searchEdit.setCompleter(self.completer)
 
         # Refreshing summary
-        status = unicode('Today is %s  Tags: %i  Notes: %i' % \
-        ('%d-%d-%d' % localtime()[:3],  len(tags), len(self.notebook.notes())), 'utf')
-        self.mainWindow.ui.statusbar.showMessage(status)
+        status = unicode('Today is %s  Tags: %i  Notes: %i' % ('%d-%d-%d' % localtime()[:3],  len(tags), len(self.notebook.notes())), 'utf')
+        self.mW.ui.statusbar.showMessage(status)
         self.tray.setToolTip(status)
 
     def openMeta(self, item):
@@ -667,28 +673,34 @@ class Application(Qt.QObject):
             self.parameter = [self.notebook.byTag, str(item.text().toUtf8())]
             self.display(self.parameter)
             desc = self.parameter[1]
+
         elif item.type == 'date':
             self.parameter = [self.notebook.byDate, str(item.text().toUtf8())]
             self.display(self.parameter)
             desc = self.parameter[1]
+
         elif item.type == 'search':
             i = item.text()
             self.search(i)
             desc = str(i.toUtf8())
+
         elif item.type == 'notebook':
             name = str(item.text().toUtf8())
+
             try:
+
                 self.setNotebook(name)
                 self.parameter = [self.notebook.notes]
                 self.refresh()
                 desc = 'All'
+
             except Exception, err:
                 self.showMessage(str(err))
         
-        self.mainWindow.ui.tabWidget.setTabText(0, unicode('%s > %s' % (self.notebook.name, desc), 'utf'))
+        self.mW.ui.tabWidget.setTabText(0, unicode('%s > %s' % (self.notebook.name, desc), 'utf'))
     
     def openDate(self):
-        date = self.mainWindow.ui.dateEdit.date()
+        date = self.mW.ui.dateEdit.date()
         self.parameter = [self.notebook.byDate, str(date.year()) + '-' + str(date.month()) + '-' + str(date.day())]
         self.display(self.parameter)
     
@@ -708,27 +720,32 @@ class Application(Qt.QObject):
     
     def search(self, text = None):
         if text is None:
-            text = self.mainWindow.ui.searchEdit.text()
+            text = self.mW.ui.searchEdit.text()
         self.parameter = [self.notebook.search, str(text.toUtf8()).split(' ')]
         self.display(self.parameter)
 
     def refreshMenu(self):
-        item = self.mainWindow.ui.metaList.currentItem()
-        self.mainWindow.ui.actionDeleteNotebook.setVisible(item.type == 'notebook')
-        self.mainWindow.ui.actionDeleteTag.setVisible(item.type == 'tag')
-        self.mainWindow.ui.actionDeleteSelectedSearch.setVisible(item.type == 'search')   
+        item = self.mW.ui.metaList.currentItem()
+        self.mW.ui.actionDeleteNotebook.setVisible(item.type == 'notebook')
+        self.mW.ui.actionDeleteTag.setVisible(item.type == 'tag')
+        self.mW.ui.actionDeleteSelectedSearch.setVisible(item.type == 'search')   
 
     def display(self, parameter):
         if len(self.parameter) == 1: entries = self.parameter[0]()
         else: entries = self.parameter[0](self.parameter[1])
         
-        self.mainWindow.ui.notesList.clear()
+        self.mW.ui.notesList.clear()
         
-        self.mainWindow.ui.numberLabel.setText(self.trUtf8("%i result(s)" % (len(entries))))
+        self.mW.ui.numberLabel.setText(self.trUtf8("%i result(s)" % (len(entries))))
         
         for i in entries:
             try:
-                item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])), unicode(i, 'utf'), self.mainWindow.ui.notesList)
+                if i in self.encrypted[self.notebook.name]:
+                    icon = ':/icons/%s/encrypt.png' % (self.settings['String']['Icons'])
+                else:
+                    icon = ':/icons/%s/note.png' % (self.settings['String']['Icons'])
+
+                item = Qt.QListWidgetItem(Qt.QIcon(icon), unicode(i, 'utf'), self.mW.ui.notesList)
                 
                 if self.settings['Bool']['Tooltips']:
                     text = self.notebook.get(i)
@@ -743,8 +760,8 @@ class Application(Qt.QObject):
                 pass
     
     def new(self, name=None, text=None):
-        if self.mainWindow.isHidden():
-            self.mainWindow.show()
+        if self.mW.isHidden():
+            self.mW.show()
         tab = EditorWidget(self)
         tab.ui.nameEdit.setEnabled(True)
 
@@ -763,14 +780,14 @@ class Application(Qt.QObject):
     
         tab.ui.nameEdit.setText(unicode(name, 'utf'))
         tab.ui.date.setText('%d-%d-%d' % localtime()[:3])
-        self.mainWindow.ui.tabWidget.addTab(tab, name)
-        self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
-        self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.tabWidget.addTab(tab, name)
+        self.mW.ui.tabWidget.setCurrentIndex(self.mW.ui.tabWidget.indexOf(tab))
+        self.mW.ui.tabWidget.setTabIcon(self.mW.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
         tab.ui.nameEdit.setFocus()
     
     def openNote(self, entry):
-        if self.mainWindow.isHidden():
-            self.mainWindow.show()
+        if self.mW.isHidden():
+            self.mW.show()
             
         tab = EditorWidget(self)
     
@@ -787,8 +804,8 @@ class Application(Qt.QObject):
         tab.note = entry
         tab.ui.date.setText(self.trUtf8(self.notebook.noteDate(entry)))
 
-        if entry in config.options('Encrypted'):
-            key = str(Qt.QInputDialog.getText(self.mainWindow, 'Enter key', 'Key: ', Qt.QLineEdit.Password)[0].toUtf8())
+        if entry in self.encrypted[self.notebook.name]:
+            key = str(Qt.QInputDialog.getText(self.mW, 'Enter key', 'Key: ', Qt.QLineEdit.Password)[0].toUtf8())
         else:
             key = None
 
@@ -807,10 +824,10 @@ class Application(Qt.QObject):
                 for tag in self.notebook.noteTags(entry):
                     tab.addTag(tag)
     
-            self.mainWindow.ui.tabWidget.addTab(tab, '')
-            self.mainWindow.ui.tabWidget.setCurrentIndex(self.mainWindow.ui.tabWidget.indexOf(tab))
-            self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
-            self.mainWindow.ui.tabWidget.setTabIcon(self.mainWindow.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
+            self.mW.ui.tabWidget.addTab(tab, '')
+            self.mW.ui.tabWidget.setCurrentIndex(self.mW.ui.tabWidget.indexOf(tab))
+            self.mW.ui.tabWidget.setTabText(self.mW.ui.tabWidget.indexOf(tab), unicode(entry, 'utf'))
+            self.mW.ui.tabWidget.setTabIcon(self.mW.ui.tabWidget.indexOf(tab), Qt.QIcon(':/icons/%s/note.png' % (self.settings['String']['Icons'])))
 
             if self.settings['Bool']['Sessions']:
                 if not entry in self.settings['List']['Session']:
@@ -821,8 +838,6 @@ class Application(Qt.QObject):
         except Exception, err:
             self.showMessage(str(err))
 
-
-
         # If search was performed:
         if self.parameter[0] == self.notebook.search:
             if len(self.parameter[1]) == 1:
@@ -831,7 +846,7 @@ class Application(Qt.QObject):
                 tab.find(searchtext)
     
     def saveNote(self):
-        tab = self.mainWindow.ui.tabWidget.currentIndex()
+        tab = self.mW.ui.tabWidget.currentIndex()
         if tab != 0: 
             widget = self.currentWidget()
             text = str(widget.ui.textEdit.toPlainText().toUtf8())
@@ -839,7 +854,7 @@ class Application(Qt.QObject):
 
             if not hasattr(widget, 'note'):
                 widget.note = str(widget.ui.nameEdit.text().toUtf8())
-                self.mainWindow.ui.tabWidget.setTabText(self.mainWindow.ui.tabWidget.indexOf(widget), unicode(widget.note, 'utf'))
+                self.mW.ui.tabWidget.setTabText(self.mW.ui.tabWidget.indexOf(widget), unicode(widget.note, 'utf'))
 
             try:
                 self.notebook.add(widget.note, text, widget.key)
@@ -864,8 +879,8 @@ class Application(Qt.QObject):
         self.new(text='\n----\n'.join(["[[" + note + "]]\n\n" + self.notebook.get(note) for note in self.selectedNotes()]))
     
     def currentNote(self):
-        index = self.mainWindow.ui.notesList.currentRow()
-        item = self.mainWindow.ui.notesList.item(index)
+        index = self.mW.ui.notesList.currentRow()
+        item = self.mW.ui.notesList.item(index)
         if not item is None:
             return str(item.text().toUtf8())
     
@@ -873,7 +888,7 @@ class Application(Qt.QObject):
         self.openNote(self.currentNote())
     
     def selectedNotes(self):
-        return ([str(item.text().toUtf8()) for item in self.mainWindow.ui.notesList.selectedItems()])
+        return ([str(item.text().toUtf8()) for item in self.mW.ui.notesList.selectedItems()])
     
     def email(self):
         if len(self.selectedNotes()) == 1:
@@ -888,34 +903,24 @@ class Application(Qt.QObject):
                 Qt.QDesktopServices().openUrl(Qt.QUrl(unicode(self.notebook.url(name), 'utf')))
     
     def deleteNotes(self):
-        if not config.has_section('Encrypted'):
-            config.add_section('Encrypted')
-            
         for note in self.selectedNotes():
             self.notebook.delete(note)
-            if note in config.options('Encrypted'):
-                config.remove_option('Encrypted', note)
+            if note in self.encrypted[self.notebook.name]:
+                self.deleteEncrypted(note)
 
-        config.write(open(config.file, 'w'))
         self.refresh()
-   
+
     def renameNote(self):
         if len(self.selectedNotes()) == 1:
             c = self.currentNote()
-
-            if not config.has_section('Encrypted'):
-                config.add_section('Encrypted')
 
             name = str(self.renameDialog.ui.lineEdit.text().toUtf8())
             if name != '' and not name in self.notebook.notes():
                 self.notebook.rename(c, name)
 
-                if c in config.options('Encrypted'):
-
-                    config.remove_option('Encrypted', c)
-                    config.set('Encrypted', name, 'Yes')
-
-                    config.write(open(config.file, 'w'))
+                if c in self.encrypted[self.notebook.name]:
+                    self.deleteEncrypted(c)
+                    self.addEncrypted(name)
 
                 self.refresh()
         else:
@@ -924,14 +929,11 @@ class Application(Qt.QObject):
     def encrypt(self):
         key = str(self.cryptDialog.ui.keyEdit.text().toUtf8())
 
-        if not config.has_section('Encrypted'):
-            config.add_section('Encrypted')
-
         for i in self.selectedNotes():
             self.notebook.add(i, self.notebook.get(i), key)
-            config.set('Encrypted', i, 'Yes')
+            self.addEncrypted(i)
 
-        config.write(open(config.file, 'w'))
+        self.refresh()
 
     def decrypt(self):
         self.decryptDialog.show()
@@ -939,8 +941,18 @@ class Application(Qt.QObject):
 
     def copyEntry(self):
         move = self.copyDialog.ui.deleteBox.isChecked()
+        notebooks = [str(i.text().toUtf8()) for i in self.copyDialog.ui.notebooks.selectedItems()]
+
         for note in self.selectedNotes():
-            self.notebook.copy(note, [str(i.text().toUtf8()) for i in self.copyDialog.ui.notebooks.selectedItems()], move)
+            self.notebook.copy(note, notebooks, move)
+
+            if note in self.encrypted[self.notebook.name]:
+                for i in  notebooks:
+                    self.addEncrypted(note, i)
+
+            if move:
+                self.deleteEncrypted(note)
+
         self.refresh()
 
     def addNotebook(self):
@@ -948,8 +960,7 @@ class Application(Qt.QObject):
             str(self.notebookDialog.ui.nameEdit.text().toUtf8()),
             str(self.notebookDialog.ui.backends.currentText().toUtf8()),
             str(self.notebookDialog.ui.markups.currentText().toUtf8()),
-            [str(i.text().toUtf8()) for i in
-                (
+            [str(i.text().toUtf8()) for i in (
                 self.notebookDialog.ui.pathEdit,
                 self.notebookDialog.ui.urlEdit,
                 self.notebookDialog.ui.loginEdit,
@@ -958,11 +969,12 @@ class Application(Qt.QObject):
                 if self.notebookDialog.settings[i]
              ]
         )
+
         self.refresh()
     
     def deleteNotebook(self):
-        notebook = str(self.mainWindow.ui.metaList.currentItem().text().toUtf8())
-        if not notebook == self.notebook.name:
+        notebook = str(self.mW.ui.metaList.currentItem().text().toUtf8())
+        if notebook != self.notebook.name:
             config.deleteNotebook(notebook)
             self.refresh()
         else:
@@ -975,7 +987,7 @@ class Application(Qt.QObject):
             self.refresh()
     
     def deleteTag(self):
-        self.notebook.deleteTag(str(self.mainWindow.ui.metaList.currentItem().text().toUtf8()))
+        self.notebook.deleteTag(str(self.mW.ui.metaList.currentItem().text().toUtf8()))
         self.refresh()
     
     def showAll(self):
@@ -986,7 +998,7 @@ class Application(Qt.QObject):
         if not config.has_section('UI'):
             config.add_section('UI')
 
-        s = str(self.mainWindow.ui.searchEdit.text().toUtf8())
+        s = str(self.mW.ui.searchEdit.text().toUtf8())
         if (s != '') and (not s in self.settings['List']['Searches']):
             self.settings['List']['Searches'].append(s)
             config.set('UI', 'Searches', '|||'.join(self.settings['List']['Searches']))
@@ -997,20 +1009,20 @@ class Application(Qt.QObject):
         if not config.has_section('UI'):
             config.add_section('UI')
 
-        s = str(self.mainWindow.ui.metaList.currentItem().text().toUtf8())
+        s = str(self.mW.ui.metaList.currentItem().text().toUtf8())
         self.settings['List']['Searches'].remove(s)
         config.set('UI', 'Searches', '|||'.join(self.settings['List']['Searches']))
         config.write(open(config.file, 'w'))
         self.refresh()
 
     def currentWidget(self):
-        return self.mainWindow.ui.tabWidget.currentWidget()
+        return self.mW.ui.tabWidget.currentWidget()
 
     def getSelection(self):
         return self.currentWidget().ui.textEdit.textCursor().selectedText()
 
     def insertMarkup(self, ft, et, text=None):
-        if not self.mainWindow.ui.tabWidget.currentIndex() == 0:
+        if not self.mW.ui.tabWidget.currentIndex() == 0:
             if text is None:
                 text = self.getSelection()
             self.currentWidget().ui.textEdit.insertPlainText(ft + text + et)
@@ -1080,14 +1092,14 @@ class Application(Qt.QObject):
         self.insertMarkup('', '', datetime.strftime(datetime.today(), '%Y-%m-%d, %H:%M:%S'))
 
     def closeEvent(self, event):
-        self.mainWindow.hide()
+        self.mW.hide()
         event.ignore()
 
     def saveSizer(self):
         if not config.has_section('UI'):
             config.add_section('UI')
         
-        l, r = self.mainWindow.ui.splitter.sizes()
+        l, r = self.mW.ui.splitter.sizes()
 
         config.set('UI', 'SplitterLeft', l)
         config.set('UI', 'SplitterRight', r)
@@ -1101,8 +1113,26 @@ class Application(Qt.QObject):
         config.set('UI', 'Session', '|||'.join(self.settings['List']['Session']))
         config.write(open(config.file, 'w'))   
 
+    def addEncrypted(self, note, notebook=None):
+        if notebook is None:
+            notebook = self.notebook.name
+
+        if not notebook in self.encrypted:
+            self.encrypted[notebook] = []
+
+        if not note in self.encrypted[notebook]:
+            self.encrypted[notebook].append(note)
+
+        pickle.dump(self.encrypted, open(os.path.expanduser('~/.config/notefinder/crypt.dat'), 'w'))
+
+    def deleteEncrypted(self, note):
+        if self.notebook.name in self.encrypted:
+            self.encrypted[self.notebook.name].remove(note)
+
+        pickle.dump(self.encrypted, open(os.path.expanduser('~/.config/notefinder/crypt.dat'), 'w'))
+
     def run(self):
-        self.mainWindow.show()
+        self.mW.show()
         sys.exit(self.application.exec_())
     
 Application().run()

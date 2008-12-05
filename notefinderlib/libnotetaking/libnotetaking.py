@@ -72,7 +72,7 @@ class Notebook(object):
 
     def copy(self, note, notebooks, move=False):
         for i in notebooks:
-            Notebook(i).add(self.get(note))
+            Notebook(i).add(note, self.get(note))
 
         if move:
             self.delete(note)

@@ -55,8 +55,8 @@ class Plugin(Qt.QAction):
         self.app.showMessage(message)
     
     def load(self):
-        self.app.mainWindow.ui.menuPlugins.addAction(self)
-        self.app.mainWindow.ui.pluginsToolbar.addAction(self)
+        self.app.mW.ui.menuPlugins.addAction(self)
+        self.app.mW.ui.pluginsToolbar.addAction(self)
         self.connect(self.app, Qt.SIGNAL('notebookChanged()'), self.onLoad)
         self.connect(self, Qt.SIGNAL('triggered()'), self.do)
         self.connect(self, Qt.SIGNAL('done()'), self.app.refresh)
