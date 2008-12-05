@@ -55,7 +55,6 @@ from notefinderlib.notefinder.AddTag import Ui_AddTagDialog
 from notefinderlib.notefinder.CopyEntry import Ui_CopyDialog
 from notefinderlib.notefinder.Credits import Ui_CreditsDialog
 from notefinderlib.notefinder.Crypt import Ui_CryptDialog
-from notefinderlib.notefinder.Decrypt import Ui_DecryptDialog
 from notefinderlib.notefinder.Delete import Ui_DeleteDialog
 from notefinderlib.notefinder.DeleteNotebook import Ui_DeleteNotebookDialog
 from notefinderlib.notefinder.DeleteTag import Ui_DeleteTagDialog
@@ -69,7 +68,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.3.7'
+__version__ = '0.4'
 
 class Application(Qt.QObject):
     def __init__(self):
