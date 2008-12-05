@@ -107,6 +107,8 @@ class Creole10(object):
         self.em = InlineElement('em', '//',[])
         self.hl = Highlight('span', '%%', [])
         self.eq = Eval('tt', '$', [])
+        # GTD functionality
+        self.gtd = GTD('span')
         if no_wiki_monospace:
             no_wiki_tag = 'tt'
         else:
@@ -116,7 +118,7 @@ class Creole10(object):
         self.em.child_tags = [self.hl, self.eq]
         self.strong.child_tags = [self.em, self.hl]
         link_child_tags = [self.strong, self.em, self.hl, self.eq]
-        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq]
+        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq, self.gtd]
         table_cell_children = [self.br, self.raw_link, self.strong, self.em, self.hl]
 
         if use_additions:
@@ -138,6 +140,7 @@ class Creole10(object):
 
             
         self.hr = LoneElement('hr','----',[])
+        
         #self.lone_br = LoneElement('br',r'\\',[])
         self.blank_line = BlankLine()
         self.lone_place_holder = LonePlaceHolder('',['<<<','>>>'],[])

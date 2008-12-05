@@ -182,7 +182,6 @@ class Eval(InlineElement):
             result = str(err)
         return bldr.tag.__getattr__(self.tag)(fragmentize(result, self.child_tags, element_store))
 
-
 macro_name = r'([a-zA-Z]+([-.]?[a-zA-Z0-9]+)*)'
 """allows any number of non-repeating hyphens or periods.
 Underscore is not included because hyphen is"""
@@ -381,7 +380,28 @@ class BodiedBlockMacro(BlockMacro):
         else:
             raise "macros can only return strings and genshi Streams"
         
-    
+
+class GTD(InlineElement):
+    def __init__(self, tag):
+        super(GTD, self).__init__(tag=tag,token=None, child_tags=None)
+        self.regexp = re.compile(self.re_string())
+        
+        self.colors = {
+            'TODO' : 'red',
+            'DONE' : 'green',
+            'NOW' : 'blue',
+        }
+        
+    def re_string(self):
+        escape = '(' + re.escape(escape_char) + ')?'
+        i = '((TODO|DONE|NOW)'
+        rest= r'\S*)'
+        return escape + i + rest
+
+    def _build(self,mo,element_store):
+        return bldr.tag.__getattr__('strong')(bldr.tag.__getattr__(self.tag)(style='color:%s' % (self.colors[mo.group(0)]))(mo.group(0)))
+
+  
 class RawLink(InlineElement):
     
     """Used to find raw urls in wiki text and build xml from them.
@@ -1093,8 +1113,6 @@ class LineBreak(InlineElement):
     
     def _build(self,mo,element_store):
         return bldr.tag.__getattr__(self.tag)()
-
-
 
 def _test():
     import doctest

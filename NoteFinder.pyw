@@ -197,7 +197,8 @@ class Application(Qt.QObject):
             self.mainWindow.ui.actionNew,
             self.mainWindow.ui.actionRename,
             self.mainWindow.ui.actionDelete,
-            self.mainWindow.ui.actionSave
+            self.mainWindow.ui.actionSave,
+            self.mainWindow.ui.actionEncrypt,
             )
 
         self.wikiActions = (
