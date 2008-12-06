@@ -68,7 +68,7 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.4'
+__version__ = '0.4.1'
 
 class Application(Qt.QObject):
     def __init__(self):
@@ -937,10 +937,6 @@ class Application(Qt.QObject):
 
         self.refresh()
 
-    def decrypt(self):
-        self.decryptDialog.show()
-        return str(self.decryptDialog.ui.keyEdit.text().toUtf8())
-
     def copyEntry(self):
         move = self.copyDialog.ui.deleteBox.isChecked()
         notebooks = [str(i.text().toUtf8()) for i in self.copyDialog.ui.notebooks.selectedItems()]
@@ -984,7 +980,7 @@ class Application(Qt.QObject):
 
     def addTag(self):
         tag = str(self.addTagDialog.ui.lineEdit.text().toUtf8())
-        if tag != '' and not tag in self.notebook.getTags():
+        if tag != '' and not tag in self.notebook.tags():
             self.notebook.addTag(tag)
             self.refresh()
     

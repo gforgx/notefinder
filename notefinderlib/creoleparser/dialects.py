@@ -106,6 +106,7 @@ class Creole10(object):
         self.strong = InlineElement('strong', '**',[])
         self.em = InlineElement('em', '//',[])
         self.hl = Highlight('span', '%%', [])
+        self.stroke = InlineElement('s', '--', [])
         self.eq = Eval('tt', '$', [])
         # GTD functionality
         self.gtd = GTD('span')
@@ -115,11 +116,11 @@ class Creole10(object):
             no_wiki_tag = 'span'
         self.no_wiki = NoWikiElement(no_wiki_tag,['{{{','}}}'],[])
         
-        self.em.child_tags = [self.hl, self.eq]
-        self.strong.child_tags = [self.em, self.hl]
+        self.em.child_tags = [self.hl, self.eq, self.strong, self.stroke]
+        self.strong.child_tags = [self.em, self.hl, self.stroke]
         link_child_tags = [self.strong, self.em, self.hl, self.eq]
-        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq, self.gtd]
-        table_cell_children = [self.br, self.raw_link, self.strong, self.em, self.hl]
+        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq, self.stroke, self.gtd]
+        table_cell_children = [self.br, self.raw_link, self.strong, self.em, self.hl, self.gtd, self.stroke]
 
         if use_additions:
             self.sub = InlineElement('sub', ',,',[])
