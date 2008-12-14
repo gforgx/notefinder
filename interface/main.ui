@@ -117,6 +117,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QTextBrowser" name="textBrowser" >
+              <property name="openLinks" >
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="numberLabel" >
               <property name="text" >
                <string/>
@@ -124,9 +131,6 @@
              </widget>
             </item>
            </layout>
-           <zorder>notesList</zorder>
-           <zorder>numberLabel</zorder>
-           <zorder></zorder>
           </widget>
          </widget>
         </item>
@@ -222,8 +226,15 @@
     <addaction name="actionImage" />
     <addaction name="actionTimestamp" />
    </widget>
+   <widget class="QMenu" name="menuView_2" >
+    <property name="title" >
+     <string>View</string>
+    </property>
+    <addaction name="actionSwitchView" />
+   </widget>
    <addaction name="menuNoteFinder" />
    <addaction name="menuEdit" />
+   <addaction name="menuView_2" />
    <addaction name="menuNotebooks" />
    <addaction name="menuTag" />
    <addaction name="menuEntry" />
@@ -251,6 +262,7 @@
    <addaction name="actionSave" />
    <addaction name="actionAll" />
    <addaction name="actionToday" />
+   <addaction name="actionSwitchView" />
   </widget>
   <widget class="QToolBar" name="editToolbar" >
    <property name="windowTitle" >
@@ -501,6 +513,14 @@
   <action name="actionEncrypt" >
    <property name="text" >
     <string>Encrypt</string>
+   </property>
+  </action>
+  <action name="actionSwitchView" >
+   <property name="checkable" >
+    <bool>true</bool>
+   </property>
+   <property name="text" >
+    <string>Switch View</string>
    </property>
   </action>
  </widget>

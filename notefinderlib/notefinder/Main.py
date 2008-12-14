@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'interface/main.ui'
 #
-# Created: Thu Dec  4 17:36:08 2008
+# Created: Tue Dec  9 16:53:42 2008
 #      by: PyQt4 UI code generator 4.4.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -72,6 +72,10 @@ class Ui_MainWindow(object):
         self.notesList.setLayoutMode(QtGui.QListView.Batched)
         self.notesList.setObjectName("notesList")
         self.verticalLayout.addWidget(self.notesList)
+        self.textBrowser = QtGui.QTextBrowser(self.layoutWidget1)
+        self.textBrowser.setOpenLinks(False)
+        self.textBrowser.setObjectName("textBrowser")
+        self.verticalLayout.addWidget(self.textBrowser)
         self.numberLabel = QtGui.QLabel(self.layoutWidget1)
         self.numberLabel.setObjectName("numberLabel")
         self.verticalLayout.addWidget(self.numberLabel)
@@ -101,6 +105,8 @@ class Ui_MainWindow(object):
         self.menuNotebooks.setObjectName("menuNotebooks")
         self.menuEdit = QtGui.QMenu(self.menuBar)
         self.menuEdit.setObjectName("menuEdit")
+        self.menuView_2 = QtGui.QMenu(self.menuBar)
+        self.menuView_2.setObjectName("menuView_2")
         MainWindow.setMenuBar(self.menuBar)
         self.mainToolbar = QtGui.QToolBar(MainWindow)
         self.mainToolbar.setIconSize(QtCore.QSize(16, 16))
@@ -181,6 +187,9 @@ class Ui_MainWindow(object):
         self.actionBulletedList.setObjectName("actionBulletedList")
         self.actionEncrypt = QtGui.QAction(MainWindow)
         self.actionEncrypt.setObjectName("actionEncrypt")
+        self.actionSwitchView = QtGui.QAction(MainWindow)
+        self.actionSwitchView.setCheckable(True)
+        self.actionSwitchView.setObjectName("actionSwitchView")
         self.menuNoteFinder.addAction(self.actionPreferences)
         self.menuNoteFinder.addSeparator()
         self.menuNoteFinder.addAction(self.actionExit)
@@ -217,8 +226,10 @@ class Ui_MainWindow(object):
         self.menuEdit.addAction(self.actionBulletedList)
         self.menuEdit.addAction(self.actionImage)
         self.menuEdit.addAction(self.actionTimestamp)
+        self.menuView_2.addAction(self.actionSwitchView)
         self.menuBar.addAction(self.menuNoteFinder.menuAction())
         self.menuBar.addAction(self.menuEdit.menuAction())
+        self.menuBar.addAction(self.menuView_2.menuAction())
         self.menuBar.addAction(self.menuNotebooks.menuAction())
         self.menuBar.addAction(self.menuTag.menuAction())
         self.menuBar.addAction(self.menuEntry.menuAction())
@@ -229,6 +240,7 @@ class Ui_MainWindow(object):
         self.mainToolbar.addAction(self.actionSave)
         self.mainToolbar.addAction(self.actionAll)
         self.mainToolbar.addAction(self.actionToday)
+        self.mainToolbar.addAction(self.actionSwitchView)
         self.editToolbar.addAction(self.actionBold)
         self.editToolbar.addAction(self.actionItalic)
         self.editToolbar.addAction(self.actionUnderlined)
@@ -255,6 +267,7 @@ class Ui_MainWindow(object):
         self.menuTag.setTitle(QtGui.QApplication.translate("MainWindow", "Ta&gs", None, QtGui.QApplication.UnicodeUTF8))
         self.menuNotebooks.setTitle(QtGui.QApplication.translate("MainWindow", "&Notebooks", None, QtGui.QApplication.UnicodeUTF8))
         self.menuEdit.setTitle(QtGui.QApplication.translate("MainWindow", "&Edit", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuView_2.setTitle(QtGui.QApplication.translate("MainWindow", "View", None, QtGui.QApplication.UnicodeUTF8))
         self.mainToolbar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Main", None, QtGui.QApplication.UnicodeUTF8))
         self.editToolbar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Edit", None, QtGui.QApplication.UnicodeUTF8))
         self.pluginsToolbar.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Plugins", None, QtGui.QApplication.UnicodeUTF8))
@@ -301,5 +314,6 @@ class Ui_MainWindow(object):
         self.actionImage.setText(QtGui.QApplication.translate("MainWindow", "Image", None, QtGui.QApplication.UnicodeUTF8))
         self.actionBulletedList.setText(QtGui.QApplication.translate("MainWindow", "Bulleted List", None, QtGui.QApplication.UnicodeUTF8))
         self.actionEncrypt.setText(QtGui.QApplication.translate("MainWindow", "Encrypt", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionSwitchView.setText(QtGui.QApplication.translate("MainWindow", "Switch View", None, QtGui.QApplication.UnicodeUTF8))
 
 import notefinder_rc

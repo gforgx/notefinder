@@ -47,6 +47,7 @@ from PyQt4 import Qt
 
 # Library imports
 from notefinderlib.libnotetaking import *
+from notefinderlib.libmarkup import engine
 from notefinderlib.creoleparser import text2html
 
 # Interface imports
@@ -68,12 +69,11 @@ from notefinderlib.notefinder.Rename import Ui_RenameDialog
 from notefinderlib.notefinder.Settings import Ui_SettingsDialog
 from notefinderlib.notefinder.notefinder_rc import *
 
-__version__ = '0.4.1'
-
 class Application(Qt.QObject):
     def __init__(self):
         Qt.QObject.__init__(self)
         self.application = Qt.QApplication(sys.argv)
+        self.__version__ = '0.4.3'
 
         # l10n
         translator = Qt.QTranslator()
@@ -116,6 +116,7 @@ class Application(Qt.QObject):
             'FileSystem' : ':/icons/icon.png',
             'Wixi' : ':/icons/wixi.png',
             'RSS' : ':/icons/rss.png',
+            'Opera' : ':/icons/opera.png',
             'Mail': ':/icons/%s/mail.png' % (self.settings['String']['Icons'])
         }
 
@@ -174,7 +175,8 @@ class Application(Qt.QObject):
         self.connect(self.mW.ui.actionNew, Qt.SIGNAL('triggered()'), self.new)
         self.connect(self.mW.ui.actionCreateIndex,  Qt.SIGNAL('triggered()'), self.buildListIndex)
         self.connect(self.mW.ui.actionMerge, Qt.SIGNAL('triggered()'), self.merge)
-        self.connect(self.mW.ui.notesList, Qt.SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.openFromList) 
+        self.connect(self.mW.ui.notesList, Qt.SIGNAL('itemDoubleClicked(QListWidgetItem *)'), self.openFromList)
+        self.connect(self.mW.ui.textBrowser, Qt.SIGNAL('anchorClicked(const QUrl)'), self.openFromTextView)
         self.connect(self.mW.ui.actionSave, Qt.SIGNAL('triggered()'), self.saveNote)
 
         self.connect(self.mW.ui.actionE_Mail, Qt.SIGNAL('triggered()'), self.email)
@@ -184,7 +186,8 @@ class Application(Qt.QObject):
 
         self.connect(self.mW.ui.actionAll, Qt.SIGNAL('triggered()'), self.showAll)
         self.connect(self.mW.ui.actionToday, Qt.SIGNAL('triggered()'), self.today)
-        
+        self.connect(self.mW.ui.actionSwitchView, Qt.SIGNAL('toggled(bool)'), self.switchView)
+
         self.connect(self.mW.ui.saveSearchButton, Qt.SIGNAL('clicked()'), self.saveSearch)
         self.connect(self.mW.ui.actionDeleteSelectedSearch, Qt.SIGNAL('triggered()'), self.deleteSearch)
 
@@ -227,7 +230,7 @@ class Application(Qt.QObject):
         self.headerLabel = Qt.QLabel()
         self.headerLabel.setPixmap(Qt.QPixmap(':/icons/%s/small/note.png' % (self.settings['String']['Icons'])))
         self.headerLayout.insertWidget(-1, self.headerLabel, 0)
-        self.headerText = Qt.QLabel('<b>NoteFinder %s</b>' % (__version__))
+        self.headerText = Qt.QLabel('<b>NoteFinder %s</b>' % (self.__version__))
         self.headerLayout.insertWidget(-1, self.headerText, 20)
         
         self.menu = Qt.QMenu()
@@ -243,7 +246,7 @@ class Application(Qt.QObject):
         self.aboutDialog = Qt.QDialog()
         self.aboutDialog.ui = Ui_AboutDialog()
         self.aboutDialog.ui.setupUi(self.aboutDialog)
-        self.aboutDialog.ui.versionLabel.setText('<h2>%s</h2>' % (__version__))
+        self.aboutDialog.ui.versionLabel.setText('<h2>%s</h2>' % (self.__version__))
 
         self.connect(self.mW.ui.actionAbout, Qt.SIGNAL('triggered()'), self.aboutDialog.show)
 
@@ -419,6 +422,7 @@ class Application(Qt.QObject):
         self.mW.ui.actionEncrypt.setIcon(Qt.QIcon(':/icons/%s/encrypt.png' % (self.settings['String']['Icons'])))
         self.mW.ui.actionAll.setIcon(Qt.QIcon(':/icons/%s/notebook.png' % (self.settings['String']['Icons'])))
         self.mW.ui.actionToday.setIcon(Qt.QIcon(':/icons/%s/calendar.png' % (self.settings['String']['Icons'])))
+        self.mW.ui.actionSwitchView.setIcon(Qt.QIcon(':/icons/%s/list.png' % (self.settings['String']['Icons'])))
         self.mW.ui.actionBold.setIcon(Qt.QIcon(':/icons/%s/bold.png' % (self.settings['String']['Icons'])))
         self.mW.ui.actionUnderlined.setIcon(Qt.QIcon(':/icons/%s/underline.png' % (self.settings['String']['Icons'])))
         self.mW.ui.actionHighlight.setIcon(Qt.QIcon(':/icons/%s/highlight.png' % (self.settings['String']['Icons'])))
@@ -558,6 +562,7 @@ class Application(Qt.QObject):
 
             config.setDefault(notebook)
             self.parameter = [self.notebook.notes]
+            self.markup = engine[config.get('Markup', notebook)]()
             self.display(self.parameter)
 
         except Exception, err:
@@ -575,6 +580,14 @@ class Application(Qt.QObject):
         self.mW.ui.dateEdit.setVisible(self.notebook.backend.Date)
         self.mW.ui.menuTag.setEnabled(self.notebook.backend.Tag)
         self.mW.ui.actionOpenExternally.setVisible(self.notebook.backend.URL)
+        
+        try:
+            b = config.getboolean('View', self.notebook.name)
+        except:
+            b = False
+    
+        self.switchView(b)
+        self.mW.ui.actionSwitchView.setChecked(b)
 
         if not fr:
             if self.settings['Bool']['Sessions']:
@@ -732,12 +745,21 @@ class Application(Qt.QObject):
     def display(self, parameter):
         if len(self.parameter) == 1: entries = self.parameter[0]()
         else: entries = self.parameter[0](self.parameter[1])
-        
+
+        entries.sort()
+
+
         self.mW.ui.notesList.clear()
+        self.mW.ui.textBrowser.clear()
         
         self.mW.ui.numberLabel.setText(self.trUtf8("%i result(s)" % (len(entries))))
+
+        textPreview = ''
         
         for i in entries:
+            
+            textPreview += '<h3><a href="%s">%s</a></h3>' % (i, i)
+            
             try:
                 if i in self.encrypted[self.notebook.name]:
                     icon = ':/icons/%s/encrypt.png' % (self.settings['String']['Icons'])
@@ -748,15 +770,22 @@ class Application(Qt.QObject):
                 
                 if self.settings['Bool']['Tooltips']:
                     text = self.notebook.get(i)
-                    if self.notebook.markup == 'Wiki': 
-                        html = text2html(unicode(text, 'utf'))
-                    else: 
-                        html = text
+                    html = self.markup.html(text)
+                    
+                    date = self.notebook.noteDate(i)
+                    tags = ', '.join(self.notebook.noteTags(i))
+                    
+                    item.setToolTip(unicode('Title: %s<br>Date: %s<br>Tags: %s<br>Text: %s<br>Length: %i characters'  % (i, date, tags, html, len(text)), 'utf'))
 
-                    item.setToolTip(unicode('Title: %s<br>Date: %s<br>Tags: %s<br>Text: %s<br>Length: %i characters' \
-                    % (i, self.notebook.noteDate(i), ', '.join(self.notebook.noteTags(i)), html, len(text)), 'utf'))
+                    textPreview += '<p><b>%s<br/>%s</b></p>' % (date, tags)
+                    textPreview += html
+
             except:
                 pass
+
+            textPreview += '<hr />'
+    
+        self.mW.ui.textBrowser.setHtml(unicode(textPreview, 'utf'))
     
     def new(self, name=None, text=None):
         if self.mW.isHidden():
@@ -885,7 +914,16 @@ class Application(Qt.QObject):
     
     def openFromList(self):
         self.openNote(self.currentNote())
-    
+
+    def openFromTextView(self, url):
+        if str(url.scheme().toUtf8()) != "":
+            Qt.QDesktopServices().openUrl(url)
+        else:
+            if self.notebook.has(str(url.path().toUtf8())):
+                self.openNote(str(url.path().toUtf8()))
+            else:
+                self.new(str(url.path().toUtf8()))
+
     def selectedNotes(self):
         return ([str(item.text().toUtf8()) for item in self.mW.ui.notesList.selectedItems()])
     
@@ -1019,75 +1057,36 @@ class Application(Qt.QObject):
     def getSelection(self):
         return self.currentWidget().ui.textEdit.textCursor().selectedText()
 
-    def insertMarkup(self, ft, et, text=None):
+    def insertMarkup(self, text):
         if not self.mW.ui.tabWidget.currentIndex() == 0:
-            if text is None:
-                text = self.getSelection()
-            self.currentWidget().ui.textEdit.insertPlainText(ft + text + et)
+            self.currentWidget().ui.textEdit.insertPlainText(text)
     
     def bold(self):
-        if self.notebook.markup == 'Wiki':
-            ft = et = '**'
-        else:
-            ft = '<b>'
-            et = '</b>'
-        self.insertMarkup(ft, et)
+        self.insertMarkup(self.markup.bold(self.getSelection()))
 
     def italic(self):
-        if self.notebook.markup == 'Wiki':
-            ft = et = '//'
-        else:
-            ft = '<i>'
-            et = '</i>'
-        self.insertMarkup(ft, et)
+        self.insertMarkup(self.markup.italic(self.getSelection()))
     
     def underline(self):
-        if self.notebook.markup == 'Wiki':
-            ft = et = '__'
-        else:
-            ft = '<u>'
-            et = '</u>'
-        self.insertMarkup(ft, et)
+        self.insertMarkup(self.markup.underlined(self.getSelection()))
     
     def highlight(self):
-        if self.notebook.markup == 'Wiki':
-            ft = et = '%%'
-        else:
-            ft = '<span style="background: yellow;">'
-            et = '</span>'
-        self.insertMarkup(ft, et)
+        self.insertMarkup(self.markup.highlighted(self.getSelection()))
    
     def image(self):
         fileDialog = Qt.QFileDialog()
         fileDialog.setWindowTitle(self.trUtf8('Select image'))
-        fileDialog.setFileMode(fileDialog.ExistingFile)
+        fileDialog.setFileMode(fileDialog.ExistingFiles)
         fileDialog.setAcceptMode(fileDialog.AcceptOpen)
         fileDialog.exec_()
-        path = fileDialog.selectedFiles()[0]
-        
-        if self.notebook.markup == 'Wiki':
-            ft = '{{'
-            et = '}}'
-        else:
-            ft = '<img src="'
-            et = '">'
-        self.insertMarkup(ft, et, path)
+        for i in fileDialog.selectedFiles():
+            self.insertMarkup(self.markup.image(i) + '\n\n')
 
     def list(self):
-        if self.notebook.markup == 'Wiki':
-            ft = '* '
-            et = ''
-            fl = el = ''
-        else:
-            ft = '<li>'
-            et = '</li>'
-            fl = '<ul>'
-            el = '</ul>'
-        
-        self.insertMarkup(fl, el, text=unicode('\n'.join([ft + i + et for i in str(self.getSelection().toUtf8()).split('\xe2\x80\xa9')]), 'utf'))
+        self.insertMarkup(self.markup.list(self.getSelection()))
     
     def insertTime(self):
-        self.insertMarkup('', '', datetime.strftime(datetime.today(), '%Y-%m-%d, %H:%M:%S'))
+        self.insertMarkup(datetime.strftime(datetime.today(), '%Y-%m-%d, %H:%M:%S'))
 
     def closeEvent(self, event):
         self.mW.hide()
@@ -1102,6 +1101,17 @@ class Application(Qt.QObject):
         config.set('UI', 'SplitterLeft', l)
         config.set('UI', 'SplitterRight', r)
 
+        config.write(open(config.file, 'w'))
+
+    def switchView(self, bool):
+        if not config.has_section('View'):
+            config.add_section('View')
+
+        self.mW.ui.textBrowser.setVisible(bool)
+        self.mW.ui.notesList.setVisible(not bool)
+        self.mW.ui.menuEntry.setEnabled(not bool)
+
+        config.set('View', self.notebook.name, str(bool))
         config.write(open(config.file, 'w'))
 
     def saveSession(self):

@@ -101,6 +101,8 @@ class Creole10(object):
         self.wiki_link = WikiLink('a','',[],delimiter = '|', base_url=wiki_links_base_url,
                                   space_char=wiki_links_space_char,class_func=wiki_links_class_func,
                                   path_func=wiki_links_path_func)
+        self.ww = WikiWikiLink('a')
+        self.m = EMail('a')
         self.img = Image('img',('{{','}}'),[],delimiter='|')
         self.link = Link('',('[[',']]'),[self.url_link,self.interwiki_link,self.wiki_link])
         self.strong = InlineElement('strong', '**',[])
@@ -119,8 +121,8 @@ class Creole10(object):
         self.em.child_tags = [self.hl, self.eq, self.strong, self.stroke]
         self.strong.child_tags = [self.em, self.hl, self.stroke]
         link_child_tags = [self.strong, self.em, self.hl, self.eq]
-        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq, self.stroke, self.gtd]
-        table_cell_children = [self.br, self.raw_link, self.strong, self.em, self.hl, self.gtd, self.stroke]
+        inline_elements = [self.no_wiki, self.img, self.link, self.br, self.raw_link, self.strong, self.em, self.hl, self.eq, self.stroke, self.gtd, self.ww, self.m]
+        table_cell_children = [self.br, self.raw_link, self.strong, self.em, self.hl, self.gtd, self.stroke, self.ww, self.m]
 
         if use_additions:
             self.sub = InlineElement('sub', ',,',[])

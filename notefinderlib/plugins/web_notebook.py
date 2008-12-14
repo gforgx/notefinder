@@ -75,13 +75,10 @@ class WebNotebook(plugin.Plugin):
         path = unicode(str(fileDialog.selectedFiles()[0].toUtf8()), 'utf').encode(sys.getfilesystemencoding())
         
         # Creating directories
-        if not os.path.exists(os.path.join(path, "notes")):
-            os.makedirs(os.path.join(path, "notes"))
-        if not os.path.exists(os.path.join(path, "dates")):
-            os.makedirs(os.path.join(path, "dates"))
-        if not os.path.exists(os.path.join(path, "tags")):
-            os.makedirs(os.path.join(path, "tags"))
-        
+        for i in ('notes', 'dates', 'tags'):
+            if not os.path.exists(os.path.join(path, i)):
+                os.makedirs(os.path.join(path, i))
+       
         # Writing CSS
         open(os.path.join(path, "style.css"), 'w').write(css)
    
@@ -93,8 +90,8 @@ class WebNotebook(plugin.Plugin):
             <body>\n<h1>NoteFinder Web Notebook</h1>\n\
             <ul>\n<li><a href='all.html'>All entries</a></li>\n\
             <li><a href='dates.html'>Dates</a></li>\n\
-            <li><a href = 'tags.html'>Tags</a></li>\n\
-            </body></html>"
+            <li><a href = 'tags.html'>Tags</a></li></ul>\
+            <hr/><i>Generated with NoteFinder %s </i></body></html>" % (self.app.__version__)
         open(os.path.join(path, "index.html"), 'w').write(index)
         
         # Creating notes
@@ -107,10 +104,10 @@ class WebNotebook(plugin.Plugin):
                 <body>\nDate: <a href = '../dates/%s.html'>%s</a>\n<br>\nTags: " % (note, date, date)
             for tag in self.app.notebook.noteTags(note):
                 html += "<a href = '../tags/%s.html'>%s</a> " % (tag, tag)
-            if self.app.notebook.markup == 'Wiki':
-                htmlcode = text2html(unicode(self.app.notebook.get(note), "utf"))
-            else:
-                htmlcode = self.app.notebook.get(note)
+            try:
+                htmlcode = self.app.markup.html(self.app.notebook.get(note))
+            except:
+                htmlcode = '<p><i>This note seems to be encrypted</i></p>'
             html += "<br>\n %s</body>\n</html>" % (htmlcode)
             open(os.path.join(path, "notes", note+".html"), 'w').write(html)
         

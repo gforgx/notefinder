@@ -77,9 +77,9 @@ class EditorWidget(Qt.QWidget):
 
         if not line == '' and not line in self.tags():
             notes = self.app.notebook.byTag(line)
-
-            item = Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' % (self.app.settings['String']['Icons'])), unicode(line, 'utf'), self.ui.tagsList)
-            item.setToolTip(self.trUtf8('Notes (%i): %s' % (len(notes), ', '.join(notes))))
+            
+            Qt.QListWidgetItem(Qt.QIcon(':/icons/%s/tag.png' \
+                % (self.app.settings['String']['Icons'])), unicode(line, 'utf'), self.ui.tagsList).setToolTip(self.trUtf8('Notes (%i): %s' % (len(notes), ', '.join(notes))))
     
             self.ui.tagEdit.lineEdit().clear()
 
@@ -96,7 +96,7 @@ class EditorWidget(Qt.QWidget):
         if str(url.scheme().toUtf8()) != "":
             Qt.QDesktopServices().openUrl(url)
         else:
-            if Note(str(url.path().toUtf8()), self.app.notebook).exists():
+            if self.app.notebook.has(str(url.path().toUtf8())):
                 self.app.openNote(str(url.path().toUtf8()))
             else:
                 self.app.new(str(url.path().toUtf8()))
@@ -109,13 +109,6 @@ class EditorWidget(Qt.QWidget):
         self.ui.textEdit.find(text)
 
     def update(self):
-        text = str(self.ui.textEdit.toPlainText().toUtf8())
-
-        if self.app.notebook.markup == 'HTML': 
-            html = text
-        else: 
-            html = text2html(unicode(text, 'utf'))
-
-        self.ui.textBrowser.setHtml(self.trUtf8(html))
+        self.ui.textBrowser.setHtml(unicode(self.app.markup.html(str(self.ui.textEdit.toPlainText().toUtf8())), 'utf'))
         if self.app.settings['Bool']['AutoSave']:
             self.app.saveNote()

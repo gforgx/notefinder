@@ -386,11 +386,7 @@ class GTD(InlineElement):
         super(GTD, self).__init__(tag=tag,token=None, child_tags=None)
         self.regexp = re.compile(self.re_string())
         
-        self.colors = {
-            'TODO' : 'red',
-            'DONE' : 'green',
-            'NOW' : 'blue',
-        }
+        self.colors = {'TODO' : 'red', 'DONE' : 'green', 'NOW' : 'blue'}
         
     def re_string(self):
         escape = '(' + re.escape(escape_char) + ')?'
@@ -414,7 +410,7 @@ class RawLink(InlineElement):
     '<a href="http://www.google.com">http://www.google.com</a>'
     
     """
-    linking_protocols = ['http','https']
+    linking_protocols = ['http','https','ftp','file']
     
     def __init__(self, tag):
         super(RawLink,self).__init__(tag=tag, token=None, child_tags=None)
@@ -422,7 +418,7 @@ class RawLink(InlineElement):
 
     def re_string(self):
         escape = '(' + re.escape(escape_char) + ')?'
-        protocol = '((https?|ftp)://'
+        protocol = '((https?|ftp|file)://'
         rest_of_url = r'\S+?)'
         #allow one punctuation character or '**' or '//'
         look_ahead = r'(?=([,.?!:;"\']|\*\*|//)?(\s|$))' 
@@ -629,8 +625,34 @@ class WikiLink(WikiElement):
         else:
             return fragmentize(mo.group(4),self.child_tags,element_store)
 
+class WikiWikiLink(InlineElement):
+    def __init__(self, tag):
+        super(WikiWikiLink, self).__init__(tag=tag,token=None, child_tags=None)
+        self.regexp = re.compile(self.re_string())
+
+    def re_string(self):
+        escape = '(' + re.escape(escape_char) + ')?'
+        i = '([A-Z]\S*[A-Z]\S*'
+        rest= r'\S*)'
+        return escape + i + rest
+
+    def _build(self,mo,element_store):
+        return bldr.tag.__getattr__(self.tag)(href=mo.group(0))(mo.group(0))
 
 
+class EMail(InlineElement):
+    def __init__(self, tag):
+        super(EMail, self).__init__(tag=tag,token=None, child_tags=None)
+        self.regexp = re.compile(self.re_string())
+
+    def re_string(self):
+        escape = '(' + re.escape(escape_char) + ')?'
+        i = '(\S*@'
+        rest= r'\S*)'
+        return escape + i + rest
+
+    def _build(self,mo,element_store):
+        return bldr.tag.__getattr__(self.tag)(href='mailto:' + mo.group(0))(mo.group(0))
 
 class BlockElement(WikiElement):
 
@@ -866,6 +888,11 @@ class Table(BlockElement):
         return '^((' + whitespace + re.escape(self.token) + \
                rest_of_line + ')+)'
 
+    def _build(self,mo,element_store):
+
+        return bldr.tag.__getattr__(self.tag)(border='0.2')(fragmentize(mo.group(1),
+                                                          self.child_tags,
+                                                          element_store))
 
 class TableRow(BlockElement):
 

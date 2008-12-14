@@ -92,6 +92,3 @@ class Config(ConfigParser.ConfigParser):
     def getBackend(self, name):
         if self.has_option('Notebooks', name):
             return self.get('Notebooks', name)
- 
-# Initializing configuration parser
-config = Config()
