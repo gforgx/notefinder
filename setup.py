@@ -46,7 +46,7 @@ else: # If something else
 setup(
         name = 'notefinder',
         # Install general stuff
-	packages = ['notefinderlib', 'notefinderlib.libnotetaking', 'notefinderlib.libnotetaking.backends', 'notefinderlib.creoleparser', 'notefinderlib.icalendar', 'notefinderlib.notefinder', 'notefinderlib.plugins'],
+	packages = ['notefinderlib', 'notefinderlib.libnotetaking', 'notefinderlib.libnotetaking.backends', 'notefinderlib.libmarkup', 'notefinderlib.libmarkup.engines', 'notefinderlib.creoleparser', 'notefinderlib.icalendar', 'notefinderlib.notefinder', 'notefinderlib.plugins'],
 	py_modules = ['notefinderlib.p3'],
         data_files = [(shortcut_dst, [shortcut]), (exec_dst, ["notefinder", "NoteFinder.pyw", "Reminder.py"]), (icon_dst, ["share/icon.png"])],
         entry_points = {
